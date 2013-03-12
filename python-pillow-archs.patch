@@ -1,0 +1,22 @@
+diff -up python-imaging-Pillow-7866759/setup.py.archs python-imaging-Pillow-7866759/setup.py
+--- python-imaging-Pillow-7866759/setup.py.archs	2013-03-12 13:33:42.992470031 +0100
++++ python-imaging-Pillow-7866759/setup.py	2013-03-12 14:25:25.558010720 +0100
+@@ -137,6 +137,18 @@ class pil_build_ext(build_ext):
+                 _add_directory(library_dirs, "/usr/lib/x86_64-linux-gnu")
+             elif platform_ in ["i386", "i686", "32bit"]:
+                 _add_directory(library_dirs, "/usr/lib/i386-linux-gnu")
++            elif platform_ in ["ppc64", "64bit"]:
++                _add_directory(library_dirs, "/lib64")
++                _add_directory(library_dirs, "/usr/lib64")
++                _add_directory(library_dirs, "/usr/lib/ppc64-linux-gnu")
++            elif platform_ in ["ppc", "32bit"]:
++                _add_directory(library_dirs, "/usr/lib/ppc-linux-gnu")
++            elif platform_ in ["s390x", "64bit"]:
++                _add_directory(library_dirs, "/lib64")
++                _add_directory(library_dirs, "/usr/lib64")
++                _add_directory(library_dirs, "/usr/lib/s390x-linux-gnu")
++            elif platform_ in ["s390", "32bit"]:
++                _add_directory(library_dirs, "/usr/lib/s390-linux-gnu")
+             else:
+                 raise ValueError("Unable to identify Linux platform: `%s`" % platform_)
+ 

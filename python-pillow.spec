@@ -12,7 +12,7 @@
 
 Name:           python-pillow
 Version:        1.7.8
-Release:        4.20130305git%{shortcommit}%{?dist}
+Release:        5.20130305git%{shortcommit}%{?dist}
 Summary:        Python 2 image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -22,6 +22,9 @@ URL:            http://python-imaging.github.com/Pillow/
 # Obtain the tarball for a certain commit via:
 #  wget --content-disposition https://github.com/python-imaging/Pillow/tarball/$commit
 Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/python-imaging-Pillow-%{version}-%{ahead}-g%{shortcommit}.tar.gz
+
+# Add s390* and ppc* archs
+Patch0:         python-pillow-archs.patch
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
@@ -155,6 +158,7 @@ Tk interface for %{name3}.
 
 %prep
 %setup -q -n python-imaging-Pillow-%{shortcommit}
+%patch0 -p1 -b .archs
 
 %if %{with_python3}
 # Create Python 3 source tree
@@ -295,6 +299,9 @@ popd
 %endif
 
 %changelog
+* Tue Mar 12 2013 Karsten Hopp <karsten@redhat.com> 1.7.8-5.20130305git
+- add s390* and ppc* to arch detection
+
 * Tue Mar 05 2013 Sandro Mani <manisandro@gmail.com> - 1.7.8-4.20130305git7866759
 - Update to latest git snapshot
 - 0001-Cast-hash-table-values-to-unsigned-long.patch now upstream
