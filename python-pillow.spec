@@ -12,7 +12,7 @@
 
 Name:           python-pillow
 Version:        1.7.8
-Release:        5.20130305git%{shortcommit}%{?dist}
+Release:        6.20130305git%{shortcommit}%{?dist}
 Summary:        Python 2 image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -299,6 +299,9 @@ popd
 %endif
 
 %changelog
+* Wed Mar 13 2013 Peter Robinson <pbrobinson@fedoraproject.org> 1.7.8-6.20130305git
+- Add ARM support
+
 * Tue Mar 12 2013 Karsten Hopp <karsten@redhat.com> 1.7.8-5.20130305git
 - add s390* and ppc* to arch detection
 
