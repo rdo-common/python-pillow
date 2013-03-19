@@ -2,17 +2,22 @@
 %global py3_incdir %{_includedir}/python%{python3_version}
 
 %global name3 python3-pillow
-%global with_python3 0
+%global with_python3 1
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-imaging-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit 78667598270a78dc9eb4cf05c85d09f39be2e394
+%global commit 2f4207c0d75150f9009fe23e9134eea34b893518
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global ahead 137
+%global ahead 11
+
+# If ahead is 0, the tarball corresponds to a release version, otherwise to a git snapshot
+%if %{ahead} > 0
+%global snap .git%{shortcommit}
+%endif
 
 Name:           python-pillow
-Version:        1.7.8
-Release:        6.20130305git%{shortcommit}%{?dist}
+Version:        2.0.0
+Release:        1%{?snap}%{?dist}
 Summary:        Python 2 image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -25,6 +30,8 @@ Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/pytho
 
 # Add s390* and ppc* archs
 Patch0:         python-pillow-archs.patch
+# Comment out a particular test which hangs due to a gcc4.8 regression
+Patch1:         python-pillow-disable-test.patch
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
@@ -36,6 +43,7 @@ BuildRequires:  zlib-devel
 BuildRequires:  freetype-devel
 BuildRequires:  lcms-devel
 BuildRequires:  sane-backends-devel
+BuildRequires:  libwebp-devel
 
 %if %{with_python3}
 BuildRequires:  python3-devel
@@ -159,6 +167,7 @@ Tk interface for %{name3}.
 %prep
 %setup -q -n python-imaging-Pillow-%{shortcommit}
 %patch0 -p1 -b .archs
+%patch1 -p1 -b .test
 
 %if %{with_python3}
 # Create Python 3 source tree
@@ -229,29 +238,35 @@ rm -rf $RPM_BUILD_ROOT%{_bindir}
 %check
 # Check Python 2 modules
 ln -s $PWD/Images $RPM_BUILD_ROOT%{python_sitearch}/Images
+ln -s $PWD/Tests $RPM_BUILD_ROOT%{python_sitearch}/Tests
 ln -s $PWD/selftest.py $RPM_BUILD_ROOT%{python_sitearch}/selftest.py
 pushd $RPM_BUILD_ROOT%{python_sitearch}
 %{__python} selftest.py
+%{__python} Tests/run.py
 popd
 rm $RPM_BUILD_ROOT%{python_sitearch}/Images
+rm $RPM_BUILD_ROOT%{python_sitearch}/Tests
 rm $RPM_BUILD_ROOT%{python_sitearch}/selftest.py*
 
 %if %{with_python3}
 # Check Python 3 modules
 pushd %{py3dir}
 ln -s $PWD/Images $RPM_BUILD_ROOT%{python3_sitearch}/Images
+ln -s $PWD/Tests $RPM_BUILD_ROOT%{python3_sitearch}/Tests
 ln -s $PWD/selftest.py $RPM_BUILD_ROOT%{python3_sitearch}/selftest.py
 pushd $RPM_BUILD_ROOT%{python3_sitearch}
 %{__python3} selftest.py
+%{__python3} Tests/run.py
 popd
 rm $RPM_BUILD_ROOT%{python3_sitearch}/Images
+rm $RPM_BUILD_ROOT%{python3_sitearch}/Tests
 rm $RPM_BUILD_ROOT%{python3_sitearch}/selftest.py*
 popd
 %endif
 
 
 %files
-%doc README.rst docs/CHANGES docs/HISTORY.txt COPYING
+%doc README.rst docs/HISTORY.txt COPYING
 %{python_sitearch}/*
 %exclude %{python_sitearch}/*sane*
 %exclude %{python_sitearch}/_imagingtk*
@@ -275,7 +290,7 @@ popd
 
 %if %{with_python3}
 %files -n %{name3}
-%doc README.rst docs/CHANGES docs/HISTORY.txt COPYING
+%doc README.rst docs/HISTORY.txt COPYING
 %{python3_sitearch}/*
 %exclude %{python3_sitearch}/*sane*
 %exclude %{python3_sitearch}/_imagingtk*
@@ -299,6 +314,11 @@ popd
 %endif
 
 %changelog
+* Tue Mar 19 2013 Sandro Mani <manisandro@gmail.com> - 2.0.0-1.git2f4207c
+- Update to 2.0.0 git snapshot
+- Enable python3 packages
+- Add libwebp-devel BR for Pillow 2.0.0
+
 * Wed Mar 13 2013 Peter Robinson <pbrobinson@fedoraproject.org> 1.7.8-6.20130305git
 - Add ARM support
 
