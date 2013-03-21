@@ -6,9 +6,9 @@
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-imaging-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit 2f4207c0d75150f9009fe23e9134eea34b893518
+%global commit 2e888483a6291992f70011f7f95b893911d47d8f
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global ahead 11
+%global ahead 26
 
 # If ahead is 0, the tarball corresponds to a release version, otherwise to a git snapshot
 %if %{ahead} > 0
@@ -17,7 +17,7 @@
 
 Name:           python-pillow
 Version:        2.0.0
-Release:        1%{?snap}%{?dist}
+Release:        2%{?snap}%{?dist}
 Summary:        Python 2 image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -30,8 +30,6 @@ Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/pytho
 
 # Add s390* and ppc* archs
 Patch0:         python-pillow-archs.patch
-# Comment out a particular test which hangs due to a gcc4.8 regression
-Patch1:         python-pillow-disable-test.patch
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
@@ -167,7 +165,6 @@ Tk interface for %{name3}.
 %prep
 %setup -q -n python-imaging-Pillow-%{shortcommit}
 %patch0 -p1 -b .archs
-%patch1 -p1 -b .test
 
 %if %{with_python3}
 # Create Python 3 source tree
@@ -314,6 +311,10 @@ popd
 %endif
 
 %changelog
+* Fri Mar 22 2013 Sandro Mani <manisandro@gmail.com> - 2.0.0-2.git2e88848
+- Update to latest git
+- Remove python-pillow-disable-test.patch, gcc is now fixed
+
 * Tue Mar 19 2013 Sandro Mani <manisandro@gmail.com> - 2.0.0-1.git2f4207c
 - Update to 2.0.0 git snapshot
 - Enable python3 packages
