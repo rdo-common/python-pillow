@@ -30,6 +30,10 @@ Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/pytho
 
 # Add s390* and ppc* archs
 Patch0:         python-pillow-archs.patch
+# The shipped lena_webp_wrote.ppm is wrong
+Patch1:         python-pillow_webp-test.patch
+# Prevent a temporary file from entering the package
+Patch2:         python-pillow_tempfile.patch
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
@@ -165,6 +169,8 @@ Tk interface for %{name3}.
 %prep
 %setup -q -n python-imaging-Pillow-%{shortcommit}
 %patch0 -p1 -b .archs
+%patch1 -p1 -b .lena
+%patch2 -p1 -b .tempfile
 
 %if %{with_python3}
 # Create Python 3 source tree
@@ -314,6 +320,7 @@ popd
 * Fri Mar 22 2013 Sandro Mani <manisandro@gmail.com> - 2.0.0-2.git2e88848
 - Update to latest git
 - Remove python-pillow-disable-test.patch, gcc is now fixed
+- Add python-pillow_tempfile.patch to prevent a temporary file from getting packaged
 
 * Tue Mar 19 2013 Sandro Mani <manisandro@gmail.com> - 2.0.0-1.git2f4207c
 - Update to 2.0.0 git snapshot

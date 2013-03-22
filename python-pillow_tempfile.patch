@@ -1,0 +1,12 @@
+diff -rupN python-imaging-Pillow-2e88848/Tests/test_file_tiff.py python-imaging-Pillow-2e88848-new/Tests/test_file_tiff.py
+--- python-imaging-Pillow-2e88848/Tests/test_file_tiff.py	2013-03-21 21:22:46.000000000 +0100
++++ python-imaging-Pillow-2e88848-new/Tests/test_file_tiff.py	2013-03-22 01:42:06.912892607 +0100
+@@ -126,7 +126,7 @@ def test_g4_write():
+     file = "Tests/images/lena_g4_500.tif"
+     orig = Image.open(file)
+ 
+-    out = "temp.tif"
++    out = tempfile("temp.tif")
+     rot = orig.transpose(Image.ROTATE_90)
+     assert_equal(rot.size,(500,500))
+     rot.save(out)
