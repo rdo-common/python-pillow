@@ -6,9 +6,9 @@
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-imaging-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit 2e888483a6291992f70011f7f95b893911d47d8f
+%global commit de210a2e2105e44e6cd98114b40fb3c91ef56806
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global ahead 26
+%global ahead 28
 
 # If ahead is 0, the tarball corresponds to a release version, otherwise to a git snapshot
 %if %{ahead} > 0
@@ -17,7 +17,7 @@
 
 Name:           python-pillow
 Version:        2.0.0
-Release:        2%{?snap}%{?dist}
+Release:        3%{?snap}%{?dist}
 Summary:        Python 2 image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -32,8 +32,6 @@ Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/pytho
 Patch0:         python-pillow-archs.patch
 # The shipped lena_webp_wrote.ppm is wrong
 Patch1:         python-pillow_webp-test.patch
-# Prevent a temporary file from entering the package
-Patch2:         python-pillow_tempfile.patch
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
@@ -55,6 +53,10 @@ BuildRequires:  python3-tkinter
 
 Provides:       python-imaging = %{version}-%{release}
 Obsoletes:      python-imaging <= 1.1.7-12
+
+%if %{with_python3}
+Provides:       python3-imaging = %{version}-%{release}
+%endif
 
 %filter_provides_in %{python_sitearch}
 %filter_provides_in %{python3_sitearch}
@@ -170,7 +172,6 @@ Tk interface for %{name3}.
 %setup -q -n python-imaging-Pillow-%{shortcommit}
 %patch0 -p1 -b .archs
 %patch1 -p1 -b .lena
-%patch2 -p1 -b .tempfile
 
 %if %{with_python3}
 # Create Python 3 source tree
@@ -317,6 +318,10 @@ popd
 %endif
 
 %changelog
+* Fri Mar 22 2013 Sandro Mani <manisandro@gmail.com> - 2.0.0-3.gitde210a2
+- python-pillow_tempfile.patch now upstream
+- Add python3-imaging provides (bug #924867)
+
 * Fri Mar 22 2013 Sandro Mani <manisandro@gmail.com> - 2.0.0-2.git2e88848
 - Update to latest git
 - Remove python-pillow-disable-test.patch, gcc is now fixed
