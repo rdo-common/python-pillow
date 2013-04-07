@@ -17,7 +17,7 @@
 
 Name:           python-pillow
 Version:        2.0.0
-Release:        4%{?snap}%{?dist}
+Release:        5%{?snap}%{?dist}
 Summary:        Python 2 image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -30,6 +30,10 @@ Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/pytho
 
 # Add s390* and ppc* archs
 Patch0:         python-pillow-archs.patch
+# Fix quantization code
+Patch1:         python-pillow_quantization.patch
+# Fix tests which are hardcoded for little-endian CPUs
+Patch2:         python-pillow_endianness.patch
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
@@ -169,6 +173,8 @@ Tk interface for %{name3}.
 %prep
 %setup -q -n python-imaging-Pillow-%{shortcommit}
 %patch0 -p1 -b .archs
+%patch1 -p1 -b .quant
+%patch2 -p1 -b .endian
 
 %if %{with_python3}
 # Create Python 3 source tree
@@ -237,7 +243,6 @@ rm -rf $RPM_BUILD_ROOT%{_bindir}
 
 
 %check
-%ifnarch ppc %{power64} s390 s390x
 # Check Python 2 modules
 ln -s $PWD/Images $RPM_BUILD_ROOT%{python_sitearch}/Images
 ln -s $PWD/Tests $RPM_BUILD_ROOT%{python_sitearch}/Tests
@@ -264,7 +269,6 @@ rm $RPM_BUILD_ROOT%{python3_sitearch}/Images
 rm $RPM_BUILD_ROOT%{python3_sitearch}/Tests
 rm $RPM_BUILD_ROOT%{python3_sitearch}/selftest.py*
 popd
-%endif
 %endif
 
 
@@ -317,6 +321,9 @@ popd
 %endif
 
 %changelog
+* Mon Apr 08 2013 Sandro Mani <manisandro@gmail.com> - 2.0.0-5.git93a488e
+- Reenable tests on bigendian, add patches for #928927
+
 * Sun Apr 07 2013 Sandro Mani <manisandro@gmail.com> - 2.0.0-4.git93a488e
 - Update to latest git
 - disable tests on bigendian (PPC*, S390*) until rhbz#928927 is fixed
