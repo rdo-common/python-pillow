@@ -6,9 +6,9 @@
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-imaging-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit de210a2e2105e44e6cd98114b40fb3c91ef56806
+%global commit 93a488ef761d2325bc38a827893d2d8035f95afc
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global ahead 28
+%global ahead 58
 
 # If ahead is 0, the tarball corresponds to a release version, otherwise to a git snapshot
 %if %{ahead} > 0
@@ -17,7 +17,7 @@
 
 Name:           python-pillow
 Version:        2.0.0
-Release:        3%{?snap}%{?dist}
+Release:        4%{?snap}%{?dist}
 Summary:        Python 2 image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -30,8 +30,6 @@ Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/pytho
 
 # Add s390* and ppc* archs
 Patch0:         python-pillow-archs.patch
-# The shipped lena_webp_wrote.ppm is wrong
-Patch1:         python-pillow_webp-test.patch
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
@@ -171,7 +169,6 @@ Tk interface for %{name3}.
 %prep
 %setup -q -n python-imaging-Pillow-%{shortcommit}
 %patch0 -p1 -b .archs
-%patch1 -p1 -b .lena
 
 %if %{with_python3}
 # Create Python 3 source tree
@@ -240,6 +237,7 @@ rm -rf $RPM_BUILD_ROOT%{_bindir}
 
 
 %check
+%ifnarch ppc %{power64} s390 s390x
 # Check Python 2 modules
 ln -s $PWD/Images $RPM_BUILD_ROOT%{python_sitearch}/Images
 ln -s $PWD/Tests $RPM_BUILD_ROOT%{python_sitearch}/Tests
@@ -266,6 +264,7 @@ rm $RPM_BUILD_ROOT%{python3_sitearch}/Images
 rm $RPM_BUILD_ROOT%{python3_sitearch}/Tests
 rm $RPM_BUILD_ROOT%{python3_sitearch}/selftest.py*
 popd
+%endif
 %endif
 
 
@@ -318,6 +317,10 @@ popd
 %endif
 
 %changelog
+* Sun Apr 07 2013 Sandro Mani <manisandro@gmail.com> - 2.0.0-4.git93a488e
+- Update to latest git
+- disable tests on bigendian (PPC*, S390*) until rhbz#928927 is fixed
+
 * Fri Mar 22 2013 Sandro Mani <manisandro@gmail.com> - 2.0.0-3.gitde210a2
 - python-pillow_tempfile.patch now upstream
 - Add python3-imaging provides (bug #924867)
