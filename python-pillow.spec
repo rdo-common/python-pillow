@@ -6,9 +6,9 @@
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-imaging-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit 93a488ef761d2325bc38a827893d2d8035f95afc
+%global commit d1c6db88d4dee462c6bbf4e22555e3ddd410d06a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global ahead 58
+%global ahead 105
 
 # If ahead is 0, the tarball corresponds to a release version, otherwise to a git snapshot
 %if %{ahead} > 0
@@ -17,8 +17,8 @@
 
 Name:           python-pillow
 Version:        2.0.0
-Release:        5%{?snap}%{?dist}
-Summary:        Python 2 image processing library
+Release:        6%{?snap}%{?dist}
+Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
 License:        MIT
@@ -30,10 +30,6 @@ Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/pytho
 
 # Add s390* and ppc* archs
 Patch0:         python-pillow-archs.patch
-# Fix quantization code
-Patch1:         python-pillow_quantization.patch
-# Fix tests which are hardcoded for little-endian CPUs
-Patch2:         python-pillow_endianness.patch
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
@@ -46,11 +42,15 @@ BuildRequires:  freetype-devel
 BuildRequires:  lcms-devel
 BuildRequires:  sane-backends-devel
 BuildRequires:  libwebp-devel
+BuildRequires:  PyQt4
+BuildRequires:  numpy
 
 %if %{with_python3}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-tkinter
+BuildRequires:  python3-PyQt4
+BuildRequires:  python3-numpy
 %endif
 
 Provides:       python-imaging = %{version}-%{release}
@@ -70,9 +70,8 @@ Python image processing library, fork of the Python Imaging Library (PIL)
 This library provides extensive file format support, an efficient
 internal representation, and powerful image processing capabilities.
 
-Notice that in order to reduce the package dependencies there are
-three subpackages: devel (for development); tk (to interact with the
-tk interface) and sane (scanning devices interface).
+There are five subpackages: tk (tk interface), qt (PIL image wrapper for Qt),
+sane (scanning devices interface), devel (development) and doc (documentation).
 
 
 %package devel
@@ -119,6 +118,17 @@ Obsoletes:      python-imaging-tk <= 1.1.7-12
 
 %description tk
 Tk interface for %{name}.
+
+%package qt
+Summary:        PIL image wrapper for Qt
+Group:          System Environment/Libraries
+Obsoletes:      %{name} <= 2.0.0-5.git93a488e
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       PyQt4
+Provides:       python-imaging-qt = %{version}-%{release}
+
+%description qt
+PIL image wrapper for Qt.
 
 
 %if %{with_python3}
@@ -167,14 +177,23 @@ Requires:       tkinter
 
 %description -n %{name3}-tk
 Tk interface for %{name3}.
+
+%package -n %{name3}-qt
+Summary:        PIL image wrapper for Qt
+Group:          System Environment/Libraries
+Obsoletes:      %{name3} <= 2.0.0-5.git93a488e8
+Requires:       %{name3}%{?_isa} = %{version}-%{release}
+Requires:       python3-PyQt4
+
+%description -n %{name3}-qt
+PIL image wrapper for Qt.
+
 %endif
 
 
 %prep
 %setup -q -n python-imaging-Pillow-%{shortcommit}
 %patch0 -p1 -b .archs
-%patch1 -p1 -b .quant
-%patch2 -p1 -b .endian
 
 %if %{with_python3}
 # Create Python 3 source tree
@@ -193,7 +212,7 @@ CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py build
 popd
 
 pushd docs
-make html
+PYTHONPATH=$PWD/.. make html
 rm -f _build/html/.buildinfo
 popd
 
@@ -208,7 +227,7 @@ CFLAGS="$RPM_OPT_FLAGS" %{__python3} setup.py build
 popd
 
 pushd docs
-make html
+PYTHONPATH=$PWD/.. make html
 rm -f _build/html/.buildinfo
 popd
 popd
@@ -275,10 +294,12 @@ popd
 %files
 %doc README.rst docs/HISTORY.txt COPYING
 %{python_sitearch}/*
+# These are in subpackages
 %exclude %{python_sitearch}/*sane*
 %exclude %{python_sitearch}/_imagingtk*
 %exclude %{python_sitearch}/PIL/ImageTk*
 %exclude %{python_sitearch}/PIL/SpiderImagePlugin*
+%exclude %{python_sitearch}/PIL/ImageQt*
 
 %files devel
 %{py2_incdir}/Imaging/
@@ -295,14 +316,19 @@ popd
 %{python_sitearch}/PIL/ImageTk*
 %{python_sitearch}/PIL/SpiderImagePlugin*
 
+%files qt
+%{python_sitearch}/PIL/ImageQt*
+
 %if %{with_python3}
 %files -n %{name3}
 %doc README.rst docs/HISTORY.txt COPYING
 %{python3_sitearch}/*
+# These are in subpackages
 %exclude %{python3_sitearch}/*sane*
 %exclude %{python3_sitearch}/_imagingtk*
 %exclude %{python3_sitearch}/PIL/ImageTk*
 %exclude %{python3_sitearch}/PIL/SpiderImagePlugin*
+%exclude %{python3_sitearch}/PIL/ImageQt*
 
 %files -n %{name3}-devel
 %{py3_incdir}/Imaging/
@@ -318,9 +344,20 @@ popd
 %{python3_sitearch}/_imagingtk*
 %{python3_sitearch}/PIL/ImageTk*
 %{python3_sitearch}/PIL/SpiderImagePlugin*
+
+%files -n %{name3}-qt
+%{python3_sitearch}/PIL/ImageQt*
+
 %endif
 
 %changelog
+* Fri Apr 19 2013 Sandro Mani <manisandro@gmail.com> - 2.0.0-6.gitd1c6db8
+- Update to latest git
+- python-pillow_quantization.patch now upstream
+- python-pillow_endianness.patch now upstream
+- Add subpackage for ImageQt module, with correct dependencies
+- Add PyQt4 and numpy BR (for generating docs / running tests)
+
 * Mon Apr 08 2013 Sandro Mani <manisandro@gmail.com> - 2.0.0-5.git93a488e
 - Reenable tests on bigendian, add patches for #928927
 
