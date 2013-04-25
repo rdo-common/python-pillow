@@ -17,7 +17,7 @@
 
 Name:           python-pillow
 Version:        2.0.0
-Release:        6%{?snap}%{?dist}
+Release:        7%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -122,7 +122,6 @@ Tk interface for %{name}.
 %package qt
 Summary:        PIL image wrapper for Qt
 Group:          System Environment/Libraries
-Obsoletes:      %{name} <= 2.0.0-5.git93a488e
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       PyQt4
 Provides:       python-imaging-qt = %{version}-%{release}
@@ -351,6 +350,12 @@ popd
 %endif
 
 %changelog
+* Thu Apr 25 2013 Toshio Kuratomi <toshio@fedoraproject.org> - 2.0.0-7.gitd1c6db8
+- Remove Obsoletes in the python-pillow-qt subpackage. Obsoletes isn't
+  appropriate since qt support didn't exist in the previous python-pillow
+  package so there's no reason to drag in python-pillow-qt when updating
+  python-pillow.
+
 * Fri Apr 19 2013 Sandro Mani <manisandro@gmail.com> - 2.0.0-6.gitd1c6db8
 - Update to latest git
 - python-pillow_quantization.patch now upstream
