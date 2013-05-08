@@ -17,7 +17,7 @@
 
 Name:           python-pillow
 Version:        2.0.0
-Release:        7%{?snap}%{?dist}
+Release:        8%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -30,6 +30,8 @@ Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/pytho
 
 # Add s390* and ppc* archs
 Patch0:         python-pillow-archs.patch
+# Fix test hardcoded for little-endian
+Patch1:         python-pillow_endian.patch
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
@@ -193,6 +195,7 @@ PIL image wrapper for Qt.
 %prep
 %setup -q -n python-imaging-Pillow-%{shortcommit}
 %patch0 -p1 -b .archs
+%patch1 -p1 -b .endian
 
 %if %{with_python3}
 # Create Python 3 source tree
@@ -350,6 +353,9 @@ popd
 %endif
 
 %changelog
+* Wed May 08 2013 Sandro Mani <manisandro@gmail.com> - 2.0.0-8.gitd1c6db8
+- Add patch to fix test failure on big-endian
+
 * Thu Apr 25 2013 Toshio Kuratomi <toshio@fedoraproject.org> - 2.0.0-7.gitd1c6db8
 - Remove Obsoletes in the python-pillow-qt subpackage. Obsoletes isn't
   appropriate since qt support didn't exist in the previous python-pillow
