@@ -2,7 +2,13 @@
 %global py3_incdir %{_includedir}/python%{python3_version}
 
 %global name3 python3-pillow
-%global with_python3 1
+
+# RHEL-7 doesn't have python 3
+%if 0%{?rhel} == 7
+  %global with_python3 0
+%else
+  %global with_python3 1
+%endif
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-imaging-Pillow-$version-$ahead-g$shortcommit.tar.gz
@@ -17,7 +23,7 @@
 
 Name:           python-pillow
 Version:        2.0.0
-Release:        8%{?snap}%{?dist}
+Release:        9%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -353,6 +359,9 @@ popd
 %endif
 
 %changelog
+* Sat May 11 2013 Roman Rakus <rrakus@redhat.com> - 2.0.0-9.gitd1c6db8
+- Conditionaly disable build of python3 parts on RHEL system
+
 * Wed May 08 2013 Sandro Mani <manisandro@gmail.com> - 2.0.0-8.gitd1c6db8
 - Add patch to fix test failure on big-endian
 
