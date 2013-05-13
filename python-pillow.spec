@@ -23,7 +23,7 @@
 
 Name:           python-pillow
 Version:        2.0.0
-Release:        9%{?snap}%{?dist}
+Release:        10%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -49,7 +49,11 @@ BuildRequires:  zlib-devel
 BuildRequires:  freetype-devel
 BuildRequires:  lcms-devel
 BuildRequires:  sane-backends-devel
+# Don't build with webp support on s390* archs
+# see bug #962091
+%ifnarch s390 s390x
 BuildRequires:  libwebp-devel
+%endif
 BuildRequires:  PyQt4
 BuildRequires:  numpy
 
@@ -359,6 +363,10 @@ popd
 %endif
 
 %changelog
+* Mon May 13 2013 Roman Rakus <rrakus@redhat.com> - 2.0.0-10
+- Build without webp support on s390* archs
+  Resolves: rhbz#962059
+
 * Sat May 11 2013 Roman Rakus <rrakus@redhat.com> - 2.0.0-9.gitd1c6db8
 - Conditionaly disable build of python3 parts on RHEL system
 
