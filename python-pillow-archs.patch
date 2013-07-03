@@ -1,7 +1,7 @@
-diff -rupN python-imaging-Pillow-2f4207c/setup.py python-imaging-Pillow-2f4207c-new/setup.py
---- python-imaging-Pillow-2f4207c/setup.py	2013-03-18 22:22:00.000000000 +0100
-+++ python-imaging-Pillow-2f4207c-new/setup.py	2013-03-19 00:58:58.629486821 +0100
-@@ -138,6 +138,30 @@ class pil_build_ext(build_ext):
+diff -rupN python-imaging-Pillow-75af7e0/setup.py python-imaging-Pillow-75af7e0-new/setup.py
+--- python-imaging-Pillow-75af7e0/setup.py	2013-07-02 14:52:49.000000000 +0200
++++ python-imaging-Pillow-75af7e0-new/setup.py	2013-07-03 20:12:40.793669521 +0200
+@@ -184,6 +184,30 @@ class pil_build_ext(build_ext):
                  elif platform_ in ["i386", "i686", "32bit"]:
                      _add_directory(library_dirs, "/usr/lib/i386-linux-gnu")
                      break
@@ -30,5 +30,5 @@ diff -rupN python-imaging-Pillow-2f4207c/setup.py python-imaging-Pillow-2f4207c-
 +                    _add_directory(library_dirs, "/usr/lib/s390-linux-gnu")
 +                    break
              else:
-                 raise ValueError("Unable to identify Linux platform: `%s`" % platform_)
- 
+                 raise ValueError(
+                     "Unable to identify Linux platform: `%s`" % platform_)

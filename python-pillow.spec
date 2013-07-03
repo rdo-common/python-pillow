@@ -1,14 +1,22 @@
 %global py2_incdir %{_includedir}/python%{python_version}
 %global py3_incdir %{_includedir}/python%{python3_version}
+%global py2_libbuilddir %(python -c 'import sys; import sysconfig; print("lib.{p}-{v[0]}.{v[1]}".format(p=sysconfig.get_platform(), v=sys.version_info))')
+%global py3_libbuilddir %(python3 -c 'import sys; import sysconfig; print("lib.{p}-{v[0]}.{v[1]}".format(p=sysconfig.get_platform(), v=sys.version_info))')
 
 %global name3 python3-pillow
-%global with_python3 1
+
+# RHEL-7 doesn't have python 3
+%if 0%{?rhel} == 7
+  %global with_python3 0
+%else
+  %global with_python3 1
+%endif
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-imaging-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit d1c6db88d4dee462c6bbf4e22555e3ddd410d06a
+%global commit 75af7e00db304ed34557c856c609d10ecf44d49c
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global ahead 105
+%global ahead 0
 
 # If ahead is 0, the tarball corresponds to a release version, otherwise to a git snapshot
 %if %{ahead} > 0
@@ -16,8 +24,8 @@
 %endif
 
 Name:           python-pillow
-Version:        2.0.0
-Release:        8%{?snap}%{?dist}
+Version:        2.1.0
+Release:        1%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -30,8 +38,6 @@ Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/pytho
 
 # Add s390* and ppc* archs
 Patch0:         python-pillow-archs.patch
-# Fix test hardcoded for little-endian
-Patch1:         python-pillow_endian.patch
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
@@ -43,7 +49,11 @@ BuildRequires:  zlib-devel
 BuildRequires:  freetype-devel
 BuildRequires:  lcms-devel
 BuildRequires:  sane-backends-devel
+# Don't build with webp support on s390* archs
+# see bug #962091
+%ifnarch s390 s390x
 BuildRequires:  libwebp-devel
+%endif
 BuildRequires:  PyQt4
 BuildRequires:  numpy
 
@@ -53,6 +63,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-tkinter
 BuildRequires:  python3-PyQt4
 BuildRequires:  python3-numpy
+BuildRequires:  python3-sphinx
 %endif
 
 Provides:       python-imaging = %{version}-%{release}
@@ -195,7 +206,6 @@ PIL image wrapper for Qt.
 %prep
 %setup -q -n python-imaging-Pillow-%{shortcommit}
 %patch0 -p1 -b .archs
-%patch1 -p1 -b .endian
 
 %if %{with_python3}
 # Create Python 3 source tree
@@ -214,7 +224,7 @@ CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py build
 popd
 
 pushd docs
-PYTHONPATH=$PWD/.. make html
+PYTHONPATH=$PWD/../build/%py2_libbuilddir make html
 rm -f _build/html/.buildinfo
 popd
 
@@ -229,7 +239,7 @@ CFLAGS="$RPM_OPT_FLAGS" %{__python3} setup.py build
 popd
 
 pushd docs
-PYTHONPATH=$PWD/.. make html
+PYTHONPATH=$PWD/../build/%py3_libbuilddir make html SPHINXBUILD=sphinx-build-%python3_version
 rm -f _build/html/.buildinfo
 popd
 popd
@@ -265,40 +275,34 @@ rm -rf $RPM_BUILD_ROOT%{_bindir}
 
 %check
 # Check Python 2 modules
-ln -s $PWD/Images $RPM_BUILD_ROOT%{python_sitearch}/Images
-ln -s $PWD/Tests $RPM_BUILD_ROOT%{python_sitearch}/Tests
-ln -s $PWD/selftest.py $RPM_BUILD_ROOT%{python_sitearch}/selftest.py
-pushd $RPM_BUILD_ROOT%{python_sitearch}
-%{__python} selftest.py
-%{__python} Tests/run.py
+ln -s $PWD/Images $PWD/build/%py2_libbuilddir/Images
+cp -R $PWD/Tests $PWD/build/%py2_libbuilddir/Tests
+cp -R $PWD/selftest.py $PWD/build/%py2_libbuilddir/selftest.py
+pushd build/%py2_libbuilddir
+PYTHONPATH=$PWD/build/%py2_libbuilddir %{__python} selftest.py
+PYTHONPATH=$PWD/build/%py2_libbuilddir %{__python} Tests/run.py
 popd
-rm $RPM_BUILD_ROOT%{python_sitearch}/Images
-rm $RPM_BUILD_ROOT%{python_sitearch}/Tests
-rm $RPM_BUILD_ROOT%{python_sitearch}/selftest.py*
 
 %if %{with_python3}
 # Check Python 3 modules
 pushd %{py3dir}
-ln -s $PWD/Images $RPM_BUILD_ROOT%{python3_sitearch}/Images
-ln -s $PWD/Tests $RPM_BUILD_ROOT%{python3_sitearch}/Tests
-ln -s $PWD/selftest.py $RPM_BUILD_ROOT%{python3_sitearch}/selftest.py
-pushd $RPM_BUILD_ROOT%{python3_sitearch}
-%{__python3} selftest.py
-%{__python3} Tests/run.py
+ln -s $PWD/Images $PWD/build/%py3_libbuilddir/Images
+cp -R $PWD/Tests $PWD/build/%py3_libbuilddir/Tests
+cp -R $PWD/selftest.py $PWD/build/%py3_libbuilddir/selftest.py
+pushd build/%py3_libbuilddir
+PYTHONPATH=$PWD/build/%py3_libbuilddir %{__python3} selftest.py
+PYTHONPATH=$PWD/build/%py3_libbuilddir %{__python3} Tests/run.py
 popd
-rm $RPM_BUILD_ROOT%{python3_sitearch}/Images
-rm $RPM_BUILD_ROOT%{python3_sitearch}/Tests
-rm $RPM_BUILD_ROOT%{python3_sitearch}/selftest.py*
 popd
 %endif
 
 
 %files
-%doc README.rst docs/HISTORY.txt COPYING
+%doc README.rst docs/HISTORY.txt docs/COPYING
 %{python_sitearch}/*
 # These are in subpackages
 %exclude %{python_sitearch}/*sane*
-%exclude %{python_sitearch}/_imagingtk*
+%exclude %{python_sitearch}/PIL/_imagingtk*
 %exclude %{python_sitearch}/PIL/ImageTk*
 %exclude %{python_sitearch}/PIL/SpiderImagePlugin*
 %exclude %{python_sitearch}/PIL/ImageQt*
@@ -314,7 +318,7 @@ popd
 %{python_sitearch}/*sane*
 
 %files tk
-%{python_sitearch}/_imagingtk*
+%{python_sitearch}/PIL/_imagingtk*
 %{python_sitearch}/PIL/ImageTk*
 %{python_sitearch}/PIL/SpiderImagePlugin*
 
@@ -323,11 +327,11 @@ popd
 
 %if %{with_python3}
 %files -n %{name3}
-%doc README.rst docs/HISTORY.txt COPYING
+%doc README.rst docs/HISTORY.txt docs/COPYING
 %{python3_sitearch}/*
 # These are in subpackages
 %exclude %{python3_sitearch}/*sane*
-%exclude %{python3_sitearch}/_imagingtk*
+%exclude %{python3_sitearch}/PIL/_imagingtk*
 %exclude %{python3_sitearch}/PIL/ImageTk*
 %exclude %{python3_sitearch}/PIL/SpiderImagePlugin*
 %exclude %{python3_sitearch}/PIL/ImageQt*
@@ -343,7 +347,7 @@ popd
 %{python3_sitearch}/*sane*
 
 %files -n %{name3}-tk
-%{python3_sitearch}/_imagingtk*
+%{python3_sitearch}/PIL/_imagingtk*
 %{python3_sitearch}/PIL/ImageTk*
 %{python3_sitearch}/PIL/SpiderImagePlugin*
 
@@ -353,6 +357,19 @@ popd
 %endif
 
 %changelog
+* Wed Jul 03 2013 Sandro Mani <manisandro@gmail.com> - 2.1.0-1
+- Update to 2.1.0
+- Run tests in builddir, not installroot
+- Build python3-pillow docs with python3
+- python-pillow_endian.patch upstreamed
+
+* Mon May 13 2013 Roman Rakus <rrakus@redhat.com> - 2.0.0-10
+- Build without webp support on s390* archs
+  Resolves: rhbz#962059
+
+* Sat May 11 2013 Roman Rakus <rrakus@redhat.com> - 2.0.0-9.gitd1c6db8
+- Conditionaly disable build of python3 parts on RHEL system
+
 * Wed May 08 2013 Sandro Mani <manisandro@gmail.com> - 2.0.0-8.gitd1c6db8
 - Add patch to fix test failure on big-endian
 
