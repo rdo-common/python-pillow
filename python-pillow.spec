@@ -25,7 +25,7 @@
 
 Name:           python-pillow
 Version:        2.1.0
-Release:        1%{?snap}%{?dist}
+Release:        2%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -50,8 +50,9 @@ BuildRequires:  freetype-devel
 BuildRequires:  lcms-devel
 BuildRequires:  sane-backends-devel
 # Don't build with webp support on s390* archs
-# see bug #962091
-%ifnarch s390 s390x
+# see bug #962091 (s390*)
+# see bug #988767 (ppc*)
+%ifnarch s390 s390x ppc %{power64}
 BuildRequires:  libwebp-devel
 %endif
 BuildRequires:  PyQt4
@@ -357,6 +358,9 @@ popd
 %endif
 
 %changelog
+* Tue Jul 30 2013 Karsten Hopp <karsten@redhat.com> 2.1.0-2
+- Build without webp support on ppc* archs (#988767)
+
 * Wed Jul 03 2013 Sandro Mani <manisandro@gmail.com> - 2.1.0-1
 - Update to 2.1.0
 - Run tests in builddir, not installroot
