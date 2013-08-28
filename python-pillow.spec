@@ -25,7 +25,7 @@
 
 Name:           python-pillow
 Version:        2.1.0
-Release:        2%{?snap}%{?dist}
+Release:        3%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -38,6 +38,8 @@ Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/pytho
 
 # Add s390* and ppc* archs
 Patch0:         python-pillow-archs.patch
+# Fix memory corruption caused by incorrect palette size
+Patch1:         python-pillow_bytearray.patch$
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
@@ -207,6 +209,7 @@ PIL image wrapper for Qt.
 %prep
 %setup -q -n python-imaging-Pillow-%{shortcommit}
 %patch0 -p1 -b .archs
+%patch1 -p1 -b .bytes
 
 %if %{with_python3}
 # Create Python 3 source tree
@@ -358,6 +361,9 @@ popd
 %endif
 
 %changelog
+* Wed Aug 28 2013 Sandro Mani <manisandro@gmail.com> - 2.1.0-3
+- Add patch to fix memory corruption caused by invalid palette size, see rhbz#1001122
+
 * Tue Jul 30 2013 Karsten Hopp <karsten@redhat.com> 2.1.0-2
 - Build without webp support on ppc* archs (#988767)
 
