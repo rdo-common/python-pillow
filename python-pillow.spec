@@ -39,7 +39,7 @@ Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/pytho
 # Add s390* and ppc* archs
 Patch0:         python-pillow-archs.patch
 # Fix memory corruption caused by incorrect palette size
-Patch1:         python-pillow_bytearray.patch$
+Patch1:         python-pillow_bytearray.patch
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
