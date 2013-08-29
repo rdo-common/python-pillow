@@ -25,7 +25,7 @@
 
 Name:           python-pillow
 Version:        2.1.0
-Release:        3%{?snap}%{?dist}
+Release:        4%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -40,6 +40,8 @@ Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/pytho
 Patch0:         python-pillow-archs.patch
 # Fix memory corruption caused by incorrect palette size
 Patch1:         python-pillow_bytearray.patch
+# Fix incorrect PyArg_ParseTuple
+Patch2:         python-pillow_tupleargs.patch
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
@@ -210,6 +212,7 @@ PIL image wrapper for Qt.
 %setup -q -n python-imaging-Pillow-%{shortcommit}
 %patch0 -p1 -b .archs
 %patch1 -p1 -b .bytes
+%patch2 -p1 -b .tupleargs
 
 %if %{with_python3}
 # Create Python 3 source tree
@@ -361,6 +364,10 @@ popd
 %endif
 
 %changelog
+* Thu Aug 29 2013 Sandro Mani <manisandro@gmail.com> - 2.1.0-4
+- Add patch to fix incorrect PyArg_ParseTuple tuple signature, fixes rhbz#962091 and rhbz#988767.
+- Renable webp support on bigendian arches
+
 * Wed Aug 28 2013 Sandro Mani <manisandro@gmail.com> - 2.1.0-3
 - Add patch to fix memory corruption caused by invalid palette size, see rhbz#1001122
 

@@ -1,0 +1,12 @@
+diff -rupN python-imaging-Pillow-75af7e0/_webp.c python-imaging-Pillow-75af7e0-new/_webp.c
+--- python-imaging-Pillow-75af7e0/_webp.c	2013-07-02 14:52:49.000000000 +0200
++++ python-imaging-Pillow-75af7e0-new/_webp.c	2013-08-29 13:03:34.558822782 +0200
+@@ -17,7 +17,7 @@ PyObject* WebPEncode_wrapper(PyObject* s
+     Py_ssize_t size;
+     size_t ret_size;
+ 
+-    if (!PyArg_ParseTuple(args, "s#nifs",(char**)&rgb, &size, &width, &height, &quality_factor, &mode)) {
++    if (!PyArg_ParseTuple(args, "s#iifs",(char**)&rgb, &size, &width, &height, &quality_factor, &mode)) {
+         Py_RETURN_NONE;
+     }
+ 
