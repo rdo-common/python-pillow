@@ -14,7 +14,7 @@
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-imaging-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit 75af7e00db304ed34557c856c609d10ecf44d49c
+%global commit 3c2496e117f4d045a99d7e376133e67b47217ce2
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global ahead 0
 
@@ -24,8 +24,8 @@
 %endif
 
 Name:           python-pillow
-Version:        2.1.0
-Release:        4%{?snap}%{?dist}
+Version:        2.2.1
+Release:        1%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -38,10 +38,6 @@ Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/pytho
 
 # Add s390* and ppc* archs
 Patch0:         python-pillow-archs.patch
-# Fix memory corruption caused by incorrect palette size
-Patch1:         python-pillow_bytearray.patch
-# Fix incorrect PyArg_ParseTuple
-Patch2:         python-pillow_tupleargs.patch
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
@@ -53,10 +49,8 @@ BuildRequires:  zlib-devel
 BuildRequires:  freetype-devel
 BuildRequires:  lcms-devel
 BuildRequires:  sane-backends-devel
-# Don't build with webp support on s390* archs
-# see bug #962091 (s390*)
-# see bug #988767 (ppc*)
-%ifnarch s390 s390x ppc %{power64}
+# Don't build with webp support on s390* archs, see bug #962091 (s390*)
+%ifnarch s390 s390x
 BuildRequires:  libwebp-devel
 %endif
 BuildRequires:  PyQt4
@@ -211,8 +205,6 @@ PIL image wrapper for Qt.
 %prep
 %setup -q -n python-imaging-Pillow-%{shortcommit}
 %patch0 -p1 -b .archs
-%patch1 -p1 -b .bytes
-%patch2 -p1 -b .tupleargs
 
 %if %{with_python3}
 # Create Python 3 source tree
@@ -364,6 +356,10 @@ popd
 %endif
 
 %changelog
+* Wed Oct 02 2013 Sandro Mani <manisandro@gmail.com> - 2.2.1-1
+- Update to 2.2.1
+- Really enable webp on ppc, but leave disabled on s390
+
 * Thu Aug 29 2013 Sandro Mani <manisandro@gmail.com> - 2.1.0-4
 - Add patch to fix incorrect PyArg_ParseTuple tuple signature, fixes rhbz#962091 and rhbz#988767.
 - Renable webp support on bigendian arches
