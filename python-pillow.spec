@@ -297,7 +297,7 @@ popd
 
 
 %files
-%doc README.rst docs/HISTORY.txt docs/COPYING
+%doc README.rst CHANGES.rst docs/COPYING
 %{python_sitearch}/*
 # These are in subpackages
 %exclude %{python_sitearch}/*sane*
