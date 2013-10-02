@@ -326,7 +326,7 @@ popd
 
 %if %{with_python3}
 %files -n %{name3}
-%doc README.rst docs/HISTORY.txt docs/COPYING
+%doc README.rst CHANGES.rst docs/COPYING
 %{python3_sitearch}/*
 # These are in subpackages
 %exclude %{python3_sitearch}/*sane*
