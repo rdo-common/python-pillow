@@ -1,0 +1,397 @@
+diff -rupN python-imaging-Pillow-3c2496e/encode.c python-imaging-Pillow-3c2496e-new/encode.c
+--- python-imaging-Pillow-3c2496e/encode.c	2013-10-02 19:07:32.000000000 +0200
++++ python-imaging-Pillow-3c2496e-new/encode.c	2013-10-22 23:17:17.175834726 +0200
+@@ -773,11 +773,10 @@ PyImaging_LibTiffEncoderNew(PyObject* se
+                                             (ttag_t) PyInt_AsLong(key),
+                                             PyInt_AsLong(value));
+         } else if(PyBytes_Check(value)) {
+-            TRACE(("Setting from String: %d, %s \n", (int)PyInt_AsLong(key),PyBytes_AsString(value)));
++            TRACE(("Setting from Bytes: %d, %s \n", (int)PyInt_AsLong(key),PyBytes_AsString(value)));
+             status = ImagingLibTiffSetField(&encoder->state,
+                                             (ttag_t) PyInt_AsLong(key),
+                                             PyBytes_AsString(value));
+-
+         } else if(PyList_Check(value)) {
+             int len,i;
+             float *floatav;
+@@ -795,12 +794,12 @@ PyImaging_LibTiffEncoderNew(PyObject* se
+                 free(floatav);
+             }
+         } else if (PyFloat_Check(value)) {
+-            TRACE(("Setting from String: %d, %f \n", (int)PyInt_AsLong(key),PyFloat_AsDouble(value)));
++            TRACE(("Setting from Float: %d, %f \n", (int)PyInt_AsLong(key),PyFloat_AsDouble(value)));
+             status = ImagingLibTiffSetField(&encoder->state,
+                                             (ttag_t) PyInt_AsLong(key),
+                                             (float)PyFloat_AsDouble(value));
+         } else {
+-            TRACE(("Unhandled type for key %d : %s ",
++            TRACE(("Unhandled type for key %d : %s \n",
+                    (int)PyInt_AsLong(key),
+                    PyBytes_AsString(PyObject_Str(value))));
+         }
+diff -rupN python-imaging-Pillow-3c2496e/libImaging/Pack.c python-imaging-Pillow-3c2496e-new/libImaging/Pack.c
+--- python-imaging-Pillow-3c2496e/libImaging/Pack.c	2013-10-02 19:07:32.000000000 +0200
++++ python-imaging-Pillow-3c2496e-new/libImaging/Pack.c	2013-10-22 23:17:17.176834743 +0200
+@@ -362,6 +362,27 @@ packI16B(UINT8* out, const UINT8* in_, i
+ }
+ 
+ static void
++packI16N_I16B(UINT8* out, const UINT8* in, int pixels){
++    int i;
++    UINT8* tmp = (UINT8*) in;
++    for (i = 0; i < pixels; i++) {
++        C16B;
++	out += 2; tmp += 2;
++    }
++	
++}
++static void
++packI16N_I16(UINT8* out, const UINT8* in, int pixels){
++    int i;
++    UINT8* tmp = (UINT8*) in;
++    for (i = 0; i < pixels; i++) {
++        C16L;
++	out += 2; tmp += 2;
++    }
++}
++
++
++static void
+ packI32S(UINT8* out, const UINT8* in, int pixels)
+ {
+     int i;
+@@ -541,6 +562,9 @@ static struct {
+     {"I;16", 	"I;16",		16,	copy2},
+     {"I;16B", 	"I;16B",	16,	copy2},
+     {"I;16L", 	"I;16L",	16,	copy2},
++    {"I;16", 	"I;16N",	16,	packI16N_I16}, // LibTiff native->image endian.
++    {"I;16L", 	"I;16N",	16,	packI16N_I16},
++    {"I;16B", 	"I;16N",	16,	packI16N_I16B},
+     {"BGR;15", 	"BGR;15",	16,	copy2},
+     {"BGR;16", 	"BGR;16",	16,	copy2},
+     {"BGR;24", 	"BGR;24",	24,	copy3},
+diff -rupN python-imaging-Pillow-3c2496e/libImaging/Storage.c python-imaging-Pillow-3c2496e-new/libImaging/Storage.c
+--- python-imaging-Pillow-3c2496e/libImaging/Storage.c	2013-10-02 19:07:32.000000000 +0200
++++ python-imaging-Pillow-3c2496e-new/libImaging/Storage.c	2013-10-22 23:17:17.176834743 +0200
+@@ -105,7 +105,8 @@ ImagingNewPrologueSubtype(const char *mo
+         im->linesize = xsize * 4;
+         im->type = IMAGING_TYPE_INT32;
+ 
+-    } else if (strcmp(mode, "I;16") == 0 || strcmp(mode, "I;16L") == 0 || strcmp(mode, "I;16B") == 0) {
++    } else if (strcmp(mode, "I;16") == 0 || strcmp(mode, "I;16L") == 0 \
++			   || strcmp(mode, "I;16B") == 0 || strcmp(mode, "I;16N") == 0)  {
+         /* EXPERIMENTAL */
+         /* 16-bit raw integer images */
+         im->bands = 1;
+diff -rupN python-imaging-Pillow-3c2496e/libImaging/Unpack.c python-imaging-Pillow-3c2496e-new/libImaging/Unpack.c
+--- python-imaging-Pillow-3c2496e/libImaging/Unpack.c	2013-10-02 19:07:32.000000000 +0200
++++ python-imaging-Pillow-3c2496e-new/libImaging/Unpack.c	2013-10-22 23:17:17.176834743 +0200
+@@ -661,6 +661,26 @@ unpackCMYKI(UINT8* out, const UINT8* in,
+ }
+ 
+ static void
++unpackI16N_I16B(UINT8* out, const UINT8* in, int pixels){
++    int i;
++    UINT8* tmp = (UINT8*) out;
++    for (i = 0; i < pixels; i++) {
++        C16B;
++		in += 2; tmp += 2;
++    }
++	
++}
++static void
++unpackI16N_I16(UINT8* out, const UINT8* in, int pixels){
++    int i;
++    UINT8* tmp = (UINT8*) out;
++    for (i = 0; i < pixels; i++) {
++        C16L;
++		in += 2; tmp += 2;
++    }
++}
++
++static void
+ copy1(UINT8* out, const UINT8* in, int pixels)
+ {
+     /* L, P */
+@@ -1004,6 +1024,10 @@ static struct {
+     {"I;16B",   "I;16B",        16,     copy2},
+     {"I;16L",   "I;16L",        16,     copy2},
+ 
++    {"I;16", 	"I;16N",	    16,	    unpackI16N_I16}, // LibTiff native->image endian.
++    {"I;16L", 	"I;16N",	    16,	    unpackI16N_I16}, // LibTiff native->image endian.
++    {"I;16B", 	"I;16N",	    16,	    unpackI16N_I16B},
++
+     {NULL} /* sentinel */
+ };
+ 
+diff -rupN python-imaging-Pillow-3c2496e/PIL/Image.py python-imaging-Pillow-3c2496e-new/PIL/Image.py
+--- python-imaging-Pillow-3c2496e/PIL/Image.py	2013-10-02 19:07:32.000000000 +0200
++++ python-imaging-Pillow-3c2496e-new/PIL/Image.py	2013-10-22 23:19:51.334508104 +0200
+@@ -224,16 +224,17 @@ _MODE_CONV = {
+     "RGBA": ('|u1', 4),
+     "CMYK": ('|u1', 4),
+     "YCbCr": ('|u1', 3),
+-    "I;16": ('=u2', None),
++    # I;16 == I;16L, and I;32 == I;32L
++    "I;16": ('<u2', None),
+     "I;16B": ('>u2', None),
+     "I;16L": ('<u2', None),
+-    "I;16S": ('=i2', None),
++    "I;16S": ('<i2', None),
+     "I;16BS": ('>i2', None),
+     "I;16LS": ('<i2', None),
+-    "I;32": ('=u4', None),
++    "I;32": ('<u4', None),
+     "I;32B": ('>u4', None),
+     "I;32L": ('<u4', None),
+-    "I;32S": ('=i4', None),
++    "I;32S": ('<i4', None),
+     "I;32BS": ('>i4', None),
+     "I;32LS": ('<i4', None),
+ }
+diff -rupN python-imaging-Pillow-3c2496e/PIL/TiffImagePlugin.py python-imaging-Pillow-3c2496e-new/PIL/TiffImagePlugin.py
+--- python-imaging-Pillow-3c2496e/PIL/TiffImagePlugin.py	2013-10-02 19:07:32.000000000 +0200
++++ python-imaging-Pillow-3c2496e-new/PIL/TiffImagePlugin.py	2013-10-22 23:17:17.174834708 +0200
+@@ -46,6 +46,7 @@ __version__ = "1.3.5"
+ from PIL import Image, ImageFile
+ from PIL import ImagePalette
+ from PIL import _binary
++from PIL._util import isStringType
+ 
+ import warnings
+ import array, sys
+@@ -804,6 +805,12 @@ class TiffImageFile(ImageFile.ImageFile)
+                     # fillorder==2 modes have a corresponding
+                     # fillorder=1 mode
+                     self.mode, rawmode = OPEN_INFO[key]
++                # libtiff always returns the bytes in native order.
++                # we're expecting image byte order. So, if the rawmode
++                # contains I;16, we need to convert from native to image
++                # byte order.
++                if self.mode in ('I;16B', 'I;16'):
++                    rawmode = 'I;16N'
+ 
+                 # Offset in the tile tuple is 0, we go from 0,0 to
+                 # w,h, and we only do this once -- eds
+@@ -1005,36 +1012,54 @@ def _save(im, fp, filename):
+             _fp = os.dup(fp.fileno())
+ 
+         blocklist =  [STRIPOFFSETS, STRIPBYTECOUNTS, ROWSPERSTRIP, ICCPROFILE] # ICC Profile crashes.
+-        atts = dict([(k,v) for (k,(v,)) in ifd.items() if k not in blocklist])
+-        try:
+-            # pull in more bits from the original file, e.g x,y resolution
+-            # so that we can save(load('')) == original file.
+-            for k,v in im.ifd.items():
+-                if k not in atts and k not in blocklist:
+-                    if type(v[0]) == tuple and len(v) > 1:
+-                       # A tuple of more than one rational tuples
+-                        # flatten to floats, following tiffcp.c->cpTag->TIFF_RATIONAL
+-                        atts[k] = [float(elt[0])/float(elt[1]) for elt in v]
+-                        continue
+-                    if type(v[0]) == tuple and len(v) == 1:
+-                       # A tuple of one rational tuples
+-                        # flatten to floats, following tiffcp.c->cpTag->TIFF_RATIONAL
+-                        atts[k] = float(v[0][0])/float(v[0][1])
+-                        continue
+-                    if type(v) == tuple and len(v) == 1:
+-                        # int or similar
+-                        atts[k] = v[0]
+-                        continue
+-                    if type(v) == str:
+-                        atts[k] = v
+-                        continue
+-
+-        except:
+-            # if we don't have an ifd here, just punt.
+-            pass
++        atts={}
++        # Merge the ones that we have with (optional) more bits from
++        # the original file, e.g x,y resolution so that we can
++        # save(load('')) == original file.
++        for k,v in itertools.chain(ifd.items(), getattr(im, 'ifd', {}).items()):
++            if k not in atts and k not in blocklist:
++                if type(v[0]) == tuple and len(v) > 1:
++                    # A tuple of more than one rational tuples
++                    # flatten to floats, following tiffcp.c->cpTag->TIFF_RATIONAL
++                    atts[k] = [float(elt[0])/float(elt[1]) for elt in v]
++                    continue
++                if type(v[0]) == tuple and len(v) == 1:
++                    # A tuple of one rational tuples
++                    # flatten to floats, following tiffcp.c->cpTag->TIFF_RATIONAL
++                    atts[k] = float(v[0][0])/float(v[0][1])
++                    continue
++                if type(v) == tuple and len(v) > 2:
++                    # List of ints?
++                    # BitsPerSample is one example, I get (8,8,8)
++                    # UNDONE
++                    continue
++                if type(v) == tuple and len(v) == 2:
++                    # one rational tuple
++                    # flatten to float, following tiffcp.c->cpTag->TIFF_RATIONAL
++                    atts[k] = float(v[0])/float(v[1])
++                    continue
++                if type(v) == tuple and len(v) == 1:
++                    v = v[0]
++                    # drop through
++                if isStringType(v):
++                    atts[k] = bytes(v.encode('ascii', 'replace')) + b"\0"
++                    continue
++                else:
++                    # int or similar
++                    atts[k] = v
++
+         if Image.DEBUG:
+             print (atts)
++
++        # libtiff always returns the bytes in native order.
++        # we're expecting image byte order. So, if the rawmode
++        # contains I;16, we need to convert from native to image
++        # byte order.
++        if im.mode in ('I;16B', 'I;16'):
++            rawmode = 'I;16N'
++
+         a = (rawmode, compression, _fp, filename, atts)
++        # print (im.mode, compression, a, im.encoderconfig)
+         e = Image._getencoder(im.mode, compression, a, im.encoderconfig)
+         e.setimage(im.im, (0,0)+im.size)
+         while 1:
+diff -rupN python-imaging-Pillow-3c2496e/Tests/test_file_libtiff.py python-imaging-Pillow-3c2496e-new/Tests/test_file_libtiff.py
+--- python-imaging-Pillow-3c2496e/Tests/test_file_libtiff.py	2013-10-02 19:07:32.000000000 +0200
++++ python-imaging-Pillow-3c2496e-new/Tests/test_file_libtiff.py	2013-10-22 23:17:17.175834726 +0200
+@@ -93,6 +93,8 @@ def test_g4_write():
+     _assert_noerr(reread)
+     assert_image_equal(reread, rot)
+ 
++    assert_equal(reread.info['compression'], orig.info['compression'])
++    
+     assert_false(orig.tobytes() == reread.tobytes())
+ 
+ def test_adobe_deflate_tiff():
+@@ -105,3 +107,65 @@ def test_adobe_deflate_tiff():
+     assert_no_exception(lambda: im.load())
+ 
+ 
++def test_little_endian():
++    im = Image.open('Tests/images/12bit.deflate.tif')
++    assert_equal(im.getpixel((0,0)), 480)
++    assert_equal(im.mode, 'I;16')
++
++    b = im.tobytes()
++    # Bytes are in image native order (little endian)
++    if py3:
++        assert_equal(b[0], ord(b'\xe0'))
++        assert_equal(b[1], ord(b'\x01'))
++    else:
++        assert_equal(b[0], b'\xe0')
++        assert_equal(b[1], b'\x01')
++        
++
++    out = tempfile("temp.tif")
++    out = "temp.le.tif"
++    im.save(out)
++    reread = Image.open(out)
++
++    assert_equal(reread.info['compression'], im.info['compression'])
++    assert_equal(reread.getpixel((0,0)), 480)
++    # UNDONE - libtiff defaults to writing in native endian, so
++    # on big endian, we'll get back mode = 'I;16B' here. 
++    
++def test_big_endian():
++    im = Image.open('Tests/images/12bit.MM.deflate.tif')
++
++    assert_equal(im.getpixel((0,0)), 480)
++    assert_equal(im.mode, 'I;16B')
++
++    b = im.tobytes()
++
++    # Bytes are in image native order (big endian)
++    if py3:
++        assert_equal(b[0], ord(b'\x01'))
++        assert_equal(b[1], ord(b'\xe0'))
++    else:
++        assert_equal(b[0], b'\x01')
++        assert_equal(b[1], b'\xe0')
++    
++    out = tempfile("temp.tif")
++    im.save(out)
++    reread = Image.open(out)
++
++    assert_equal(reread.info['compression'], im.info['compression'])
++    assert_equal(reread.getpixel((0,0)), 480)
++
++def test_g4_string_info():
++    """Tests String data in info directory"""
++    file = "Tests/images/lena_g4_500.tif"
++    orig = Image.open(file)
++    
++    out = tempfile("temp.tif")
++
++    orig.tag[269] = 'temp.tif'
++    orig.save(out)
++             
++    reread = Image.open(out)
++    assert_equal('temp.tif', reread.tag[269])
++
++
+diff -rupN python-imaging-Pillow-3c2496e/Tests/test_file_tiff.py python-imaging-Pillow-3c2496e-new/Tests/test_file_tiff.py
+--- python-imaging-Pillow-3c2496e/Tests/test_file_tiff.py	2013-10-02 19:07:32.000000000 +0200
++++ python-imaging-Pillow-3c2496e-new/Tests/test_file_tiff.py	2013-10-22 23:17:17.175834726 +0200
+@@ -71,3 +71,34 @@ def test_xyres_tiff():
+     im.tag.tags[Y_RESOLUTION] = (72,)
+     im._setup()
+     assert_equal(im.info['dpi'], (72., 72.))
++
++
++def test_little_endian():
++	im = Image.open('Tests/images/12bit.cropped.tif')
++	assert_equal(im.getpixel((0,0)), 480)
++	assert_equal(im.mode, 'I;16')
++
++	b = im.tobytes()
++	# Bytes are in image native order (little endian)
++	if py3:
++		assert_equal(b[0], ord(b'\xe0'))
++		assert_equal(b[1], ord(b'\x01'))
++	else:
++		assert_equal(b[0], b'\xe0')
++		assert_equal(b[1], b'\x01')
++		
++
++def test_big_endian():
++	im = Image.open('Tests/images/12bit.MM.cropped.tif')
++	assert_equal(im.getpixel((0,0)), 480)
++	assert_equal(im.mode, 'I;16B')
++
++	b = im.tobytes()
++
++	# Bytes are in image native order (big endian)
++	if py3:
++		assert_equal(b[0], ord(b'\x01'))
++		assert_equal(b[1], ord(b'\xe0'))
++	else:
++		assert_equal(b[0], b'\x01')
++		assert_equal(b[1], b'\xe0')
+diff -rupN python-imaging-Pillow-3c2496e/Tests/test_numpy.py python-imaging-Pillow-3c2496e-new/Tests/test_numpy.py
+--- python-imaging-Pillow-3c2496e/Tests/test_numpy.py	2013-10-02 19:07:32.000000000 +0200
++++ python-imaging-Pillow-3c2496e-new/Tests/test_numpy.py	2013-10-22 23:17:17.175834726 +0200
+@@ -78,7 +78,7 @@ def test_16bit():
+     img = Image.open('Tests/images/12bit.cropped.tif')
+     np_img = numpy.array(img)
+     _test_img_equals_nparray(img, np_img)
+-    assert_equal(np_img.dtype, numpy.dtype('uint16'))
++    assert_equal(np_img.dtype, numpy.dtype('<u2'))
+ 
+ def test_to_array():
+ 
+@@ -97,9 +97,9 @@ def test_to_array():
+              ("RGBX", 'uint8'),
+              ("CMYK", 'uint8'),
+              ("YCbCr", 'uint8'),
+-             ("I;16", 'uint16'),
++             ("I;16", '<u2'),
+              ("I;16B", '>u2'),
+-             ("I;16L", 'uint16'),
++             ("I;16L", '<u2'),
+              ]
+     
+ 
