@@ -14,7 +14,7 @@
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-imaging-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit 3c2496e117f4d045a99d7e376133e67b47217ce2
+%global commit b1b88cf4d255c4b9faf1dae05faaa78091268cb1
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global ahead 0
 
@@ -24,8 +24,8 @@
 %endif
 
 Name:           python-pillow
-Version:        2.2.1
-Release:        2%{?snap}%{?dist}
+Version:        2.3.0
+Release:        1%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -35,15 +35,10 @@ URL:            http://python-imaging.github.com/Pillow/
 # Obtain the tarball for a certain commit via:
 #  wget --content-disposition https://github.com/python-imaging/Pillow/tarball/$commit
 Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/python-imaging-Pillow-%{version}-%{ahead}-g%{shortcommit}.tar.gz
-Source1:        12bit.MM.cropped.tif
-Source2:        12bit.MM.deflate.tif
-Source3:        12bit.deflate.tif
 
 
 # Add s390* and ppc* archs
 Patch0:         python-pillow-archs.patch
-# Fix tiff byteorder issues, see https://github.com/python-imaging/Pillow/pull/388
-Patch1:         python-pillow_tiff-byteorder.patch
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
@@ -211,10 +206,6 @@ PIL image wrapper for Qt.
 %prep
 %setup -q -n python-imaging-Pillow-%{shortcommit}
 %patch0 -p1 -b .archs
-%patch1 -p1
-cp -a %{SOURCE1} Tests/images
-cp -a %{SOURCE2} Tests/images
-cp -a %{SOURCE3} Tests/images
 
 %if %{with_python3}
 # Create Python 3 source tree
@@ -256,30 +247,30 @@ popd
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 # Install Python 2 modules
-install -d $RPM_BUILD_ROOT/%{py2_incdir}/Imaging
-install -m 644 libImaging/*.h $RPM_BUILD_ROOT/%{py2_incdir}/Imaging
-%{__python} setup.py install --skip-build --root $RPM_BUILD_ROOT
+install -d %{buildroot}/%{py2_incdir}/Imaging
+install -m 644 libImaging/*.h %{buildroot}/%{py2_incdir}/Imaging
+%{__python} setup.py install --skip-build --root %{buildroot}
 pushd Sane
-%{__python} setup.py install --skip-build --root $RPM_BUILD_ROOT
+%{__python} setup.py install --skip-build --root %{buildroot}
 popd
 
 %if %{with_python3}
 # Install Python 3 modules
 pushd %{py3dir}
-install -d $RPM_BUILD_ROOT/%{py3_incdir}/Imaging
-install -m 644 libImaging/*.h $RPM_BUILD_ROOT/%{py3_incdir}/Imaging
-%{__python3} setup.py install --skip-build --root $RPM_BUILD_ROOT
+install -d %{buildroot}/%{py3_incdir}/Imaging
+install -m 644 libImaging/*.h %{buildroot}/%{py3_incdir}/Imaging
+%{__python3} setup.py install --skip-build --root %{buildroot}
 pushd Sane
-%{__python3} setup.py install --skip-build --root $RPM_BUILD_ROOT
+%{__python3} setup.py install --skip-build --root %{buildroot}
 popd
 popd
 %endif
 
 # The scripts are packaged in %%doc
-rm -rf $RPM_BUILD_ROOT%{_bindir}
+rm -rf %{buildroot}%{_bindir}
 
 
 %check
@@ -366,6 +357,9 @@ popd
 %endif
 
 %changelog
+* Thu Jan 02 2014 Sandro Mani <manisandro@gmail.com> - 2.3.0-1
+- Update to 2.3.0
+
 * Wed Oct 23 2013 Sandro Mani <manisandro@gmail.com> - 2.2.1-2
 - Backport fix for decoding tiffs with correct byteorder, fixes rhbz#1019656
 
