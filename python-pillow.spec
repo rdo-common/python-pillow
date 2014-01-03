@@ -25,7 +25,7 @@
 
 Name:           python-pillow
 Version:        2.3.0
-Release:        1%{?snap}%{?dist}
+Release:        2%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -46,7 +46,7 @@ BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
 BuildRequires:  tkinter
 BuildRequires:  tk-devel
-# BuildRequires:  python-sphinx
+BuildRequires:  python-sphinx
 BuildRequires:  libjpeg-devel
 BuildRequires:  zlib-devel
 BuildRequires:  freetype-devel
@@ -65,7 +65,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-tkinter
 BuildRequires:  python3-PyQt4
 BuildRequires:  python3-numpy
-# BuildRequires:  python3-sphinx
+BuildRequires:  python3-sphinx
 %endif
 
 Provides:       python-imaging = %{version}-%{release}
@@ -227,7 +227,7 @@ CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py build
 popd
 
 pushd docs
-# PYTHONPATH=$PWD/../build/%%py2_libbuilddir make html
+PYTHONPATH=$PWD/../build/%py2_libbuilddir make html
 rm -f _build/html/.buildinfo
 popd
 
@@ -242,7 +242,7 @@ CFLAGS="$RPM_OPT_FLAGS" %{__python3} setup.py build
 popd
 
 pushd docs
-# PYTHONPATH=$PWD/../build/%%py3_libbuilddir make html SPHINXBUILD=sphinx-build-%%python3_version
+PYTHONPATH=$PWD/../build/%py3_libbuilddir make html SPHINXBUILD=sphinx-build-%python3_version
 rm -f _build/html/.buildinfo
 popd
 popd
@@ -314,8 +314,7 @@ popd
 %{py2_incdir}/Imaging/
 
 %files doc
-%doc Scripts Images
-# docs/_build/html
+%doc Scripts Images docs/_build/html
 
 %files sane
 %doc Sane/CHANGES Sane/demo*.py Sane/sanedoc.txt
@@ -344,8 +343,7 @@ popd
 %{py3_incdir}/Imaging/
 
 %files -n %{name3}-doc
-%doc Scripts Images
-# docs/_build/html
+%doc Scripts Images docs/_build/html
 
 %files -n %{name3}-sane
 %doc Sane/CHANGES Sane/demo*.py Sane/sanedoc.txt
@@ -362,6 +360,9 @@ popd
 %endif
 
 %changelog
+* Fri Jan 03 2014 Sandro Mani <manisandro@gmail.com> - 2.3.0-2
+- Rebuild with docs enable
+
 * Thu Jan 02 2014 Sandro Mani <manisandro@gmail.com> - 2.3.0-1
 - Update to 2.3.0
 - Build with doc disabled to break circular python-pillow -> python-sphinx -> python pillow dependency
