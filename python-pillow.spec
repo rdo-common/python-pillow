@@ -41,6 +41,8 @@ Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/pytho
 Patch0:         python-pillow-archs.patch
 # Fix overly-strict test
 Patch1:         python-pillow_test-webp.patch
+# Use default help theme until python-sphinx-theme-better is reviewed
+Patch2:         python-pillow_help-theme.patch
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
@@ -50,7 +52,7 @@ BuildRequires:  python-sphinx
 BuildRequires:  libjpeg-devel
 BuildRequires:  zlib-devel
 BuildRequires:  freetype-devel
-BuildRequires:  lcms-devel
+BuildRequires:  lcms2-devel
 BuildRequires:  sane-backends-devel
 # Don't build with webp support on s390* archs, see bug #962091 (s390*)
 %ifnarch s390 s390x
@@ -209,6 +211,7 @@ PIL image wrapper for Qt.
 %setup -q -n python-imaging-Pillow-%{shortcommit}
 %patch0 -p1 -b .archs
 %patch1 -p1
+%patch2 -p1
 
 %if %{with_python3}
 # Create Python 3 source tree
@@ -361,7 +364,8 @@ popd
 
 %changelog
 * Fri Jan 03 2014 Sandro Mani <manisandro@gmail.com> - 2.3.0-2
-- Rebuild with docs enable
+- Rebuild with docs enabled
+- Change lcms BR to lcms2
 
 * Thu Jan 02 2014 Sandro Mani <manisandro@gmail.com> - 2.3.0-1
 - Update to 2.3.0
