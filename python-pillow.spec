@@ -363,7 +363,7 @@ popd
 %endif
 
 %changelog
-* Fri Jan 03 2014 Sandro Mani <manisandro@gmail.com> - 2.3.0-2
+* Sun Jan 05 2014 Sandro Mani <manisandro@gmail.com> - 2.3.0-2
 - Rebuild with docs enabled
 - Change lcms BR to lcms2
 
