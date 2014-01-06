@@ -25,7 +25,7 @@
 
 Name:           python-pillow
 Version:        2.3.0
-Release:        2%{?snap}%{?dist}
+Release:        3%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -41,14 +41,13 @@ Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/pytho
 Patch0:         python-pillow-archs.patch
 # Fix overly-strict test
 Patch1:         python-pillow_test-webp.patch
-# Use default help theme until python-sphinx-theme-better is reviewed
-Patch2:         python-pillow_help-theme.patch
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
 BuildRequires:  tkinter
 BuildRequires:  tk-devel
 BuildRequires:  python-sphinx
+BuildRequires:  python-sphinx-theme-better
 BuildRequires:  libjpeg-devel
 BuildRequires:  zlib-devel
 BuildRequires:  freetype-devel
@@ -68,6 +67,7 @@ BuildRequires:  python3-tkinter
 BuildRequires:  python3-PyQt4
 BuildRequires:  python3-numpy
 BuildRequires:  python3-sphinx
+BuildRequires:  python3-sphinx-theme-better
 %endif
 
 Provides:       python-imaging = %{version}-%{release}
@@ -211,7 +211,6 @@ PIL image wrapper for Qt.
 %setup -q -n python-imaging-Pillow-%{shortcommit}
 %patch0 -p1 -b .archs
 %patch1 -p1
-%patch2 -p1
 
 %if %{with_python3}
 # Create Python 3 source tree
@@ -363,6 +362,9 @@ popd
 %endif
 
 %changelog
+* Mon Jan 06 2014 Sandro Mani <manisandro@gmail.com> - 2.3.0-3
+- Remove python-pillow_help-theme.patch, add python-sphinx-theme-better BR
+
 * Sun Jan 05 2014 Sandro Mani <manisandro@gmail.com> - 2.3.0-2
 - Rebuild with docs enabled
 - Change lcms BR to lcms2
