@@ -25,7 +25,7 @@
 
 Name:           python-pillow
 Version:        2.3.0
-Release:        3%{?snap}%{?dist}
+Release:        4%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -42,23 +42,25 @@ Patch0:         python-pillow-archs.patch
 # Fix overly-strict test
 Patch1:         python-pillow_test-webp.patch
 
-BuildRequires:  python2-devel
-BuildRequires:  python-setuptools
-BuildRequires:  tkinter
 BuildRequires:  tk-devel
-BuildRequires:  python-sphinx
-BuildRequires:  python-sphinx-theme-better
 BuildRequires:  libjpeg-devel
 BuildRequires:  zlib-devel
 BuildRequires:  freetype-devel
 BuildRequires:  lcms2-devel
 BuildRequires:  sane-backends-devel
+BuildRequires:  ghostscript
 # Don't build with webp support on s390* archs, see bug #962091 (s390*)
 %ifnarch s390 s390x
 BuildRequires:  libwebp-devel
 %endif
+
+BuildRequires:  python2-devel
+BuildRequires:  python-setuptools
+BuildRequires:  tkinter
 BuildRequires:  PyQt4
 BuildRequires:  numpy
+BuildRequires:  python-sphinx
+BuildRequires:  python-sphinx-theme-better
 
 %if %{with_python3}
 BuildRequires:  python3-devel
@@ -69,6 +71,9 @@ BuildRequires:  python3-numpy
 BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx-theme-better
 %endif
+
+# For EpsImagePlugin.py
+Requires:       ghostscript
 
 Provides:       python-imaging = %{version}-%{release}
 Obsoletes:      python-imaging <= 1.1.7-12
@@ -362,6 +367,9 @@ popd
 %endif
 
 %changelog
+* Tue Jan 07 2014 Sandro Mani <manisandro@gmail.com> - 2.3.0-4
+- Add missing ghostscript Requires and BuildRequires
+
 * Mon Jan 06 2014 Sandro Mani <manisandro@gmail.com> - 2.3.0-3
 - Remove python-pillow_help-theme.patch, add python-sphinx-theme-better BR
 
