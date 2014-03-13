@@ -25,7 +25,7 @@
 
 Name:           python-pillow
 Version:        2.3.0
-Release:        4%{?snap}%{?dist}
+Release:        5%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -77,10 +77,6 @@ Requires:       ghostscript
 
 Provides:       python-imaging = %{version}-%{release}
 Obsoletes:      python-imaging <= 1.1.7-12
-
-%if %{with_python3}
-Provides:       python3-imaging = %{version}-%{release}
-%endif
 
 %filter_provides_in %{python_sitearch}
 %filter_provides_in %{python3_sitearch}
@@ -155,6 +151,7 @@ PIL image wrapper for Qt.
 %if %{with_python3}
 %package -n %{name3}
 Summary:        Python 3 image processing library
+Provides:       python3-imaging = %{version}-%{release}
 
 %description -n %{name3}
 %{_description}
@@ -367,6 +364,10 @@ popd
 %endif
 
 %changelog
+* Thu Mar 13 2014 Jakub Dorňák <jdornak@redhat.com> - 2.3.0-5
+- python-pillow does not provide python3-imaging
+  (python3-pillow does)
+
 * Tue Jan 07 2014 Sandro Mani <manisandro@gmail.com> - 2.3.0-4
 - Add missing ghostscript Requires and BuildRequires
 
