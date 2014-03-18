@@ -14,7 +14,7 @@
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-imaging-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit b1b88cf4d255c4b9faf1dae05faaa78091268cb1
+%global commit b8d4895bd5c41fce88a8ad436672bd8033414797
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global ahead 0
 
@@ -24,8 +24,8 @@
 %endif
 
 Name:           python-pillow
-Version:        2.3.0
-Release:        5%{?snap}%{?dist}
+Version:        2.3.1
+Release:        1%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -364,6 +364,9 @@ popd
 %endif
 
 %changelog
+* Wed Mar 19 2014 Sndro Mani <manisandro@gmail.com> - 2.3.1-1
+- Update to 2.3.1 (Fix insecure use of tempfile.mktemp (CVE-2014-1932 CVE-2014-1933))
+
 * Thu Mar 13 2014 Jakub Dorňák <jdornak@redhat.com> - 2.3.0-5
 - python-pillow does not provide python3-imaging
   (python3-pillow does)
