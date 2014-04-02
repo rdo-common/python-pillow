@@ -14,7 +14,7 @@
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-imaging-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit b8d4895bd5c41fce88a8ad436672bd8033414797
+%global commit 72de37caada5d9ff7c657ce5f4ad6f8a6a3870f0
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global ahead 0
 
@@ -24,7 +24,7 @@
 %endif
 
 Name:           python-pillow
-Version:        2.3.1
+Version:        2.4.0
 Release:        1%{?snap}%{?dist}
 Summary:        Python image processing library
 
@@ -364,7 +364,10 @@ popd
 %endif
 
 %changelog
-* Wed Mar 19 2014 Sndro Mani <manisandro@gmail.com> - 2.3.1-1
+* Wed Apr 02 2014 Sandro Mani <manisandro@gmail.com> - 2.4.0-1
+- Update to 2.4.0
+
+* Wed Mar 19 2014 Sandro Mani <manisandro@gmail.com> - 2.3.1-1
 - Update to 2.3.1 (Fix insecure use of tempfile.mktemp (CVE-2014-1932 CVE-2014-1933))
 
 * Thu Mar 13 2014 Jakub Dorňák <jdornak@redhat.com> - 2.3.0-5
