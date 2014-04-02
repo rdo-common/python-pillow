@@ -37,11 +37,6 @@ URL:            http://python-imaging.github.com/Pillow/
 Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/python-imaging-Pillow-%{version}-%{ahead}-g%{shortcommit}.tar.gz
 
 
-# Add s390* and ppc* archs
-Patch0:         python-pillow-archs.patch
-# Fix overly-strict test
-Patch1:         python-pillow_test-webp.patch
-
 BuildRequires:  tk-devel
 BuildRequires:  libjpeg-devel
 BuildRequires:  zlib-devel
@@ -211,8 +206,6 @@ PIL image wrapper for Qt.
 
 %prep
 %setup -q -n python-imaging-Pillow-%{shortcommit}
-%patch0 -p1 -b .archs
-%patch1 -p1
 
 %if %{with_python3}
 # Create Python 3 source tree
