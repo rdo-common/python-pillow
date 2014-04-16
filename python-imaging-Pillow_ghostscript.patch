@@ -1,0 +1,89 @@
+From 82d7524add60d020a339503efe0559a11f89e238 Mon Sep 17 00:00:00 2001
+From: wiredfool <eric-github@soroos.net>
+Date: Fri, 4 Apr 2014 13:33:54 -0700
+Subject: [PATCH] made has_ghostscript a method, using it from test_imagefile
+
+---
+ PIL/EpsImagePlugin.py   | 15 +++++++++++++++
+ Tests/test_file_eps.py  | 12 +-----------
+ Tests/test_imagefile.py |  6 ++++--
+ 3 files changed, 20 insertions(+), 13 deletions(-)
+
+diff --git a/PIL/EpsImagePlugin.py b/PIL/EpsImagePlugin.py
+index 8868634..4d19c1f 100644
+--- a/PIL/EpsImagePlugin.py
++++ b/PIL/EpsImagePlugin.py
+@@ -50,6 +50,21 @@
+     else:
+         gs_windows_binary = False
+ 
++def has_ghostscript():
++    if gs_windows_binary:
++        return True
++    if not sys.platform.startswith('win'):
++        import subprocess
++        try:
++            gs = subprocess.Popen(['gs','--version'], stdout=subprocess.PIPE)
++            gs.stdout.read()
++            return True
++        except OSError:
++            # no ghostscript
++            pass
++    return False
++   
++
+ def Ghostscript(tile, size, fp, scale=1):
+     """Render an image using Ghostscript"""
+ 
+diff --git a/Tests/test_file_eps.py b/Tests/test_file_eps.py
+index 61faa63..0041824 100644
+--- a/Tests/test_file_eps.py
++++ b/Tests/test_file_eps.py
+@@ -4,19 +4,9 @@
+ import sys
+ import io
+ 
+-if not EpsImagePlugin.gs_windows_binary:
+-    # already checked. Not there.
++if not EpsImagePlugin.has_ghostscript():
+     skip()
+ 
+-if not sys.platform.startswith('win'):
+-    import subprocess
+-    try:
+-        gs = subprocess.Popen(['gs','--version'], stdout=subprocess.PIPE)
+-        gs.stdout.read()
+-    except OSError:
+-        # no ghostscript
+-        skip()
+-
+ #Our two EPS test files (they are identical except for their bounding boxes)
+ file1 = "Tests/images/zero_bb.eps"
+ file2 = "Tests/images/non_zero_bb.eps"
+diff --git a/Tests/test_imagefile.py b/Tests/test_imagefile.py
+index 12061eb..adf282b 100644
+--- a/Tests/test_imagefile.py
++++ b/Tests/test_imagefile.py
+@@ -2,6 +2,7 @@
+ 
+ from PIL import Image
+ from PIL import ImageFile
++from PIL import EpsImagePlugin
+ 
+ codecs = dir(Image.core)
+ 
+@@ -46,8 +47,9 @@ def roundtrip(format):
+     assert_image_equal(*roundtrip("TGA"))
+     assert_image_equal(*roundtrip("PCX"))
+ 
+-    im1, im2 = roundtrip("EPS")
+-    assert_image_similar(im1, im2.convert('L'),20) # EPS comes back in RGB      
++    if EpsImagePlugin.has_ghostscript():
++        im1, im2 = roundtrip("EPS")
++        assert_image_similar(im1, im2.convert('L'),20) # EPS comes back in RGB      
+     
+     if "jpeg_encoder" in codecs:
+         im1, im2 = roundtrip("JPEG") # lossy compression
+-- 
+1.9.1
+

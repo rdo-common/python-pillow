@@ -25,7 +25,7 @@
 
 Name:           python-pillow
 Version:        2.4.0
-Release:        1%{?snap}%{?dist}
+Release:        2%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -36,6 +36,8 @@ URL:            http://python-imaging.github.com/Pillow/
 #  wget --content-disposition https://github.com/python-imaging/Pillow/tarball/$commit
 Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/python-imaging-Pillow-%{version}-%{ahead}-g%{shortcommit}.tar.gz
 
+# Fix ghostscript detection (upstream commit 82d7524add60d020a339503efe0559a11f89e238)
+Patch0:         python-imaging-Pillow_ghostscript.patch
 
 BuildRequires:  tk-devel
 BuildRequires:  libjpeg-devel
@@ -43,11 +45,9 @@ BuildRequires:  zlib-devel
 BuildRequires:  freetype-devel
 BuildRequires:  lcms2-devel
 BuildRequires:  sane-backends-devel
-BuildRequires:  ghostscript
-# Don't build with webp support on s390* archs, see bug #962091 (s390*)
-%ifnarch s390 s390x
+# BuildRequires:  ghostscript # Running test fails, see #921706#c38
+BuildRequires:  openjpeg2-devel
 BuildRequires:  libwebp-devel
-%endif
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
@@ -56,6 +56,7 @@ BuildRequires:  PyQt4
 BuildRequires:  numpy
 BuildRequires:  python-sphinx
 BuildRequires:  python-sphinx-theme-better
+BuildRequires:  python-cffi
 
 %if %{with_python3}
 BuildRequires:  python3-devel
@@ -65,6 +66,7 @@ BuildRequires:  python3-PyQt4
 BuildRequires:  python3-numpy
 BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx-theme-better
+BuildRequires:  python3-cffi
 %endif
 
 # For EpsImagePlugin.py
@@ -206,6 +208,7 @@ PIL image wrapper for Qt.
 
 %prep
 %setup -q -n python-imaging-Pillow-%{shortcommit}
+%patch0 -p1
 
 %if %{with_python3}
 # Create Python 3 source tree
@@ -279,8 +282,8 @@ ln -s $PWD/Images $PWD/build/%py2_libbuilddir/Images
 cp -R $PWD/Tests $PWD/build/%py2_libbuilddir/Tests
 cp -R $PWD/selftest.py $PWD/build/%py2_libbuilddir/selftest.py
 pushd build/%py2_libbuilddir
-PYTHONPATH=$PWD/build/%py2_libbuilddir %{__python} selftest.py
-PYTHONPATH=$PWD/build/%py2_libbuilddir %{__python} Tests/run.py
+PYTHONPATH=$PWD %{__python} selftest.py
+PYTHONPATH=$PWD %{__python} Tests/run.py
 popd
 
 %if %{with_python3}
@@ -290,8 +293,8 @@ ln -s $PWD/Images $PWD/build/%py3_libbuilddir/Images
 cp -R $PWD/Tests $PWD/build/%py3_libbuilddir/Tests
 cp -R $PWD/selftest.py $PWD/build/%py3_libbuilddir/selftest.py
 pushd build/%py3_libbuilddir
-PYTHONPATH=$PWD/build/%py3_libbuilddir %{__python3} selftest.py
-PYTHONPATH=$PWD/build/%py3_libbuilddir %{__python3} Tests/run.py
+PYTHONPATH=$PWD %{__python3} selftest.py
+PYTHONPATH=$PWD %{__python3} Tests/run.py
 popd
 popd
 %endif
@@ -357,6 +360,11 @@ popd
 %endif
 
 %changelog
+* Thu Apr 17 2014 Sandro Mani <manisandro@gmail.com> - 2.4.0-2
+- Enable Jpeg2000 support
+- Enable webp support also on s390* archs, bug #962091 is now fixed
+- Add upstream patch for ghostscript detection
+
 * Wed Apr 02 2014 Sandro Mani <manisandro@gmail.com> - 2.4.0-1
 - Update to 2.4.0
 
