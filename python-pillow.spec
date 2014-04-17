@@ -210,6 +210,9 @@ PIL image wrapper for Qt.
 %setup -q -n python-imaging-Pillow-%{shortcommit}
 %patch0 -p1
 
+# Running test fails, see #921706#c38
+rm -f Tests/test_file_eps.py
+
 %if %{with_python3}
 # Create Python 3 source tree
 rm -rf %{py3dir}
@@ -275,9 +278,6 @@ rm -rf %{buildroot}%{_bindir}
 
 
 %check
-# Running test fails, see #921706#c38
-rm -f Tests/test_file_eps.py
-
 # Check Python 2 modules
 ln -s $PWD/Images $PWD/build/%py2_libbuilddir/Images
 cp -R $PWD/Tests $PWD/build/%py2_libbuilddir/Tests
