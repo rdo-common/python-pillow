@@ -25,7 +25,7 @@
 
 Name:           python-pillow
 Version:        2.4.0
-Release:        2%{?snap}%{?dist}
+Release:        3%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -38,6 +38,9 @@ Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/pytho
 
 # Fix ghostscript detection (upstream commit 82d7524add60d020a339503efe0559a11f89e238)
 Patch0:         python-imaging-Pillow_ghostscript.patch
+# Have the tempfile use a suffix with a dot
+Patch1:         python-pillow_tmpsuffix.patch
+
 
 BuildRequires:  tk-devel
 BuildRequires:  libjpeg-devel
@@ -209,6 +212,7 @@ PIL image wrapper for Qt.
 %prep
 %setup -q -n python-imaging-Pillow-%{shortcommit}
 %patch0 -p1
+%patch1 -p1
 
 # Running test fails, see #921706#c38
 rm -f Tests/test_file_eps.py
@@ -361,6 +365,9 @@ popd
 %endif
 
 %changelog
+* Tue Apr 22 2014 Sandro Mani <manisandro@gmail.com> - 2.4.0-3
+- Add patch: Have the tempfile use a suffix with a dot
+
 * Thu Apr 17 2014 Sandro Mani <manisandro@gmail.com> - 2.4.0-2
 - Enable Jpeg2000 support
 - Enable webp support also on s390* archs, bug #962091 is now fixed
