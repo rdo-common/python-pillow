@@ -25,7 +25,7 @@
 
 Name:           python-pillow
 Version:        2.4.0
-Release:        3%{?snap}%{?dist}
+Release:        4%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -365,6 +365,9 @@ popd
 %endif
 
 %changelog
+* Fri May  9 2014 Orion Poplawski <orion@cora.nwra.com> - 2.4.0-4
+- Rebuild for Python 3.4
+
 * Tue Apr 22 2014 Sandro Mani <manisandro@gmail.com> - 2.4.0-3
 - Add patch: Have the tempfile use a suffix with a dot
 
