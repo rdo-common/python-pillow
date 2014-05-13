@@ -4,6 +4,9 @@
 %global py3_libbuilddir %(python3 -c 'import sys; import sysconfig; print("lib.{p}-{v[0]}.{v[1]}".format(p=sysconfig.get_platform(), v=sys.version_info))')
 
 %global name3 python3-pillow
+# bootstrap building docs (pillow is required by docutils, docutils are
+#  required by sphinx; pillow build-requires sphinx)
+%global with_docs 0
 
 # RHEL-7 doesn't have python 3
 %if 0%{?rhel} == 7
@@ -25,7 +28,7 @@
 
 Name:           python-pillow
 Version:        2.4.0
-Release:        4%{?snap}%{?dist}
+Release:        5%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -57,8 +60,10 @@ BuildRequires:  python-setuptools
 BuildRequires:  tkinter
 BuildRequires:  PyQt4
 BuildRequires:  numpy
+%if 0%{?with_docs}
 BuildRequires:  python-sphinx
 BuildRequires:  python-sphinx-theme-better
+%endif # with_docs
 BuildRequires:  python-cffi
 
 %if %{with_python3}
@@ -67,8 +72,10 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-tkinter
 BuildRequires:  python3-PyQt4
 BuildRequires:  python3-numpy
+%if 0%{?with_docs}
 BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx-theme-better
+%endif # with_docs
 BuildRequires:  python3-cffi
 %endif
 
@@ -233,10 +240,12 @@ pushd Sane
 CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py build
 popd
 
+%if 0%{?with_docs}
 pushd docs
 PYTHONPATH=$PWD/../build/%py2_libbuilddir make html
 rm -f _build/html/.buildinfo
 popd
+%endif # with_docs
 
 %if %{with_python3}
 # Build Python 3 modules
@@ -248,10 +257,12 @@ pushd Sane
 CFLAGS="$RPM_OPT_FLAGS" %{__python3} setup.py build
 popd
 
+%if 0%{?with_docs}
 pushd docs
 PYTHONPATH=$PWD/../build/%py3_libbuilddir make html SPHINXBUILD=sphinx-build-%python3_version
 rm -f _build/html/.buildinfo
 popd
+%endif # with_docs
 popd
 %endif
 
@@ -319,7 +330,10 @@ popd
 %{py2_incdir}/Imaging/
 
 %files doc
-%doc Scripts Images docs/_build/html
+%doc Scripts Images
+%if 0%{?with_docs}
+docs/_build/html
+%endif # with_docs
 
 %files sane
 %doc Sane/CHANGES Sane/demo*.py Sane/sanedoc.txt
@@ -348,7 +362,10 @@ popd
 %{py3_incdir}/Imaging/
 
 %files -n %{name3}-doc
-%doc Scripts Images docs/_build/html
+%doc Scripts Images
+%if 0%{?with_docs}
+%doc docs/_build/html
+%endif # with_docs
 
 %files -n %{name3}-sane
 %doc Sane/CHANGES Sane/demo*.py Sane/sanedoc.txt
@@ -365,6 +382,9 @@ popd
 %endif
 
 %changelog
+* Tue May 13 2014 Bohuslav Kabrda <bkabrda@redhat.com> - 2.4.0-5
+- Bootstrap building sphinx docs because of circular dependency with sphinx.
+
 * Fri May  9 2014 Orion Poplawski <orion@cora.nwra.com> - 2.4.0-4
 - Rebuild for Python 3.4
 
