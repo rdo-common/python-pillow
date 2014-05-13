@@ -6,7 +6,7 @@
 %global name3 python3-pillow
 # bootstrap building docs (pillow is required by docutils, docutils are
 #  required by sphinx; pillow build-requires sphinx)
-%global with_docs 0
+%global with_docs 1
 
 # RHEL-7 doesn't have python 3
 %if 0%{?rhel} == 7
@@ -28,7 +28,7 @@
 
 Name:           python-pillow
 Version:        2.4.0
-Release:        5%{?snap}%{?dist}
+Release:        6%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -332,7 +332,7 @@ popd
 %files doc
 %doc Scripts Images
 %if 0%{?with_docs}
-docs/_build/html
+%doc docs/_build/html
 %endif # with_docs
 
 %files sane
@@ -382,6 +382,9 @@ docs/_build/html
 %endif
 
 %changelog
+* Tue May 13 2014 Bohuslav Kabrda <bkabrda@redhat.com> - 2.4.0-6
+- Set with_docs to 1 to build docs.
+
 * Tue May 13 2014 Bohuslav Kabrda <bkabrda@redhat.com> - 2.4.0-5
 - Bootstrap building sphinx docs because of circular dependency with sphinx.
 
