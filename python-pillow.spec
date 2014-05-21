@@ -28,7 +28,7 @@
 
 Name:           python-pillow
 Version:        2.4.0
-Release:        6%{?snap}%{?dist}
+Release:        7%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -382,6 +382,9 @@ popd
 %endif
 
 %changelog
+* Wed May 21 2014 Jaroslav Škarvada <jskarvad@redhat.com> - 2.4.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Changes/f21tcl86
+
 * Tue May 13 2014 Bohuslav Kabrda <bkabrda@redhat.com> - 2.4.0-6
 - Set with_docs to 1 to build docs.
 
