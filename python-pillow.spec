@@ -28,7 +28,7 @@
 
 Name:           python-pillow
 Version:        2.4.0
-Release:        7%{?snap}%{?dist}
+Release:        8%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -223,6 +223,10 @@ PIL image wrapper for Qt.
 
 # Running test fails, see #921706#c38
 rm -f Tests/test_file_eps.py
+# jpeg2k tests fail on big endians, see #1100762
+%ifarch ppc ppc64 ppc64p7 s390 s390x
+rm -f Tests/test_file_jpeg2k.py
+%endif
 
 %if %{with_python3}
 # Create Python 3 source tree
@@ -382,6 +386,9 @@ popd
 %endif
 
 %changelog
+* Fri May 23 2014 Dan Horák <dan[at]danny.cz> - 2.4.0-8
+- skip jpeg2k tests on big endian arches (#1100762)
+
 * Wed May 21 2014 Jaroslav Škarvada <jskarvad@redhat.com> - 2.4.0-7
 - Rebuilt for https://fedoraproject.org/wiki/Changes/f21tcl86
 
