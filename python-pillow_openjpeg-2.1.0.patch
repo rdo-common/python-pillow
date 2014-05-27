@@ -1,0 +1,213 @@
+diff -rupN python-imaging-Pillow-72de37c/decode.c python-imaging-Pillow-72de37c-new/decode.c
+--- python-imaging-Pillow-72de37c/decode.c	2014-04-02 00:31:55.000000000 +0200
++++ python-imaging-Pillow-72de37c-new/decode.c	2014-05-27 14:12:58.913340062 +0200
+@@ -800,8 +800,9 @@ PyImaging_Jpeg2KDecoderNew(PyObject* sel
+     int reduce = 0;
+     int layers = 0;
+     int fd = -1;
+-    if (!PyArg_ParseTuple(args, "ss|iii", &mode, &format,
+-                          &reduce, &layers, &fd))
++    PY_LONG_LONG length = -1;
++    if (!PyArg_ParseTuple(args, "ss|iiiL", &mode, &format,
++                          &reduce, &layers, &fd, &length))
+         return NULL;
+ 
+     if (strcmp(format, "j2k") == 0)
+@@ -824,6 +825,7 @@ PyImaging_Jpeg2KDecoderNew(PyObject* sel
+     context = (JPEG2KDECODESTATE *)decoder->state.context;
+ 
+     context->fd = fd;
++    context->length = (off_t)length;
+     context->format = codec_format;
+     context->reduce = reduce;
+     context->layers = layers;
+diff -rupN python-imaging-Pillow-72de37c/libImaging/Jpeg2KDecode.c python-imaging-Pillow-72de37c-new/libImaging/Jpeg2KDecode.c
+--- python-imaging-Pillow-72de37c/libImaging/Jpeg2KDecode.c	2014-04-02 00:31:55.000000000 +0200
++++ python-imaging-Pillow-72de37c-new/libImaging/Jpeg2KDecode.c	2014-05-27 14:14:02.756806143 +0200
+@@ -517,7 +517,21 @@ j2k_decode_entry(Imaging im, ImagingCode
+     opj_stream_set_read_function(stream, j2k_read);
+     opj_stream_set_skip_function(stream, j2k_skip);
+ 
++/* OpenJPEG 2.0 doesn't have OPJ_VERSION_MAJOR */
++#ifndef OPJ_VERSION_MAJOR
+     opj_stream_set_user_data(stream, decoder);
++#else
++    opj_stream_set_user_data(stream, decoder, NULL);
++
++    /* Hack: if we don't know the length, the largest file we can
++       possibly support is 4GB.  We can't go larger than this, because
++       OpenJPEG truncates this value for the final box in the file, and
++       the box lengths in OpenJPEG are currently 32 bit. */
++    if (context->length < 0)
++        opj_stream_set_user_data_length(stream, 0xffffffff);
++    else
++        opj_stream_set_user_data_length(stream, context->length);
++#endif
+ 
+     /* Setup decompression context */
+     context->error_msg = NULL;
+diff -rupN python-imaging-Pillow-72de37c/libImaging/Jpeg2KEncode.c python-imaging-Pillow-72de37c-new/libImaging/Jpeg2KEncode.c
+--- python-imaging-Pillow-72de37c/libImaging/Jpeg2KEncode.c	2014-04-02 00:31:55.000000000 +0200
++++ python-imaging-Pillow-72de37c-new/libImaging/Jpeg2KEncode.c	2014-05-27 14:12:58.915340109 +0200
+@@ -259,7 +259,11 @@ j2k_encode_entry(Imaging im, ImagingCode
+     opj_stream_set_skip_function(stream, j2k_skip);
+     opj_stream_set_seek_function(stream, j2k_seek);
+ 
++#if OPJ_VERSION_MAJOR == 2 && OPJ_VERSION_MINOR == 0
+     opj_stream_set_user_data(stream, encoder);
++#else
++    opj_stream_set_user_data(stream, encoder, NULL);
++#endif
+ 
+     /* Setup an opj_image */
+     if (strcmp (im->mode, "L") == 0) {
+diff -rupN python-imaging-Pillow-72de37c/libImaging/Jpeg2K.h python-imaging-Pillow-72de37c-new/libImaging/Jpeg2K.h
+--- python-imaging-Pillow-72de37c/libImaging/Jpeg2K.h	2014-04-02 00:31:55.000000000 +0200
++++ python-imaging-Pillow-72de37c-new/libImaging/Jpeg2K.h	2014-05-27 14:12:58.913340062 +0200
+@@ -8,7 +8,7 @@
+  * Copyright (c) 2014 by Alastair Houghton
+  */
+ 
+-#include <openjpeg-2.0/openjpeg.h>
++#include <openjpeg.h>
+ 
+ /* -------------------------------------------------------------------- */
+ /* Decoder								*/
+@@ -20,6 +20,9 @@ typedef struct {
+     /* File descriptor, if available; otherwise, -1 */
+     int fd;
+ 
++    /* Length of data, if available; otherwise, -1 */
++    off_t length;
++
+     /* Specify the desired format */
+     OPJ_CODEC_FORMAT format;
+ 
+diff -rupN python-imaging-Pillow-72de37c/PIL/Jpeg2KImagePlugin.py python-imaging-Pillow-72de37c-new/PIL/Jpeg2KImagePlugin.py
+--- python-imaging-Pillow-72de37c/PIL/Jpeg2KImagePlugin.py	2014-04-02 00:31:55.000000000 +0200
++++ python-imaging-Pillow-72de37c-new/PIL/Jpeg2KImagePlugin.py	2014-05-27 14:12:58.912340040 +0200
+@@ -155,15 +155,25 @@ class Jpeg2KImageFile(ImageFile.ImageFil
+         self.layers = 0
+ 
+         fd = -1
++        length = -1
+ 
+         if hasattr(self.fp, "fileno"):
+             try:
+                 fd = self.fp.fileno()
++                length = os.fstat(fd).st_size
+             except:
+                 fd = -1
+-
++        elif hasattr(self.fp, "seek"):
++            try:
++                pos = f.tell()
++                seek(0, 2)
++                length = f.tell()
++                seek(pos, 0)
++            except:
++                length = -1
++        
+         self.tile = [('jpeg2k', (0, 0) + self.size, 0,
+-                      (self.codec, self.reduce, self.layers, fd))]
++                      (self.codec, self.reduce, self.layers, fd, length))]
+ 
+     def load(self):
+         if self.reduce:
+@@ -175,7 +185,7 @@ class Jpeg2KImageFile(ImageFile.ImageFil
+         if self.tile:
+             # Update the reduce and layers settings
+             t = self.tile[0]
+-            t3 = (t[3][0], self.reduce, self.layers, t[3][3])
++            t3 = (t[3][0], self.reduce, self.layers, t[3][3], t[3][4])
+             self.tile = [(t[0], (0, 0) + self.size, t[2], t3)]
+         
+         ImageFile.ImageFile.load(self)
+diff -rupN python-imaging-Pillow-72de37c/setup.py python-imaging-Pillow-72de37c-new/setup.py
+--- python-imaging-Pillow-72de37c/setup.py	2014-04-02 00:31:55.000000000 +0200
++++ python-imaging-Pillow-72de37c-new/setup.py	2014-05-27 14:12:58.916340132 +0200
+@@ -331,14 +331,23 @@ class pil_build_ext(build_ext):
+         _add_directory(include_dirs, "/usr/include")
+ 
+         # on Windows, look for the OpenJPEG libraries in the location that
+-        # the official installed puts them
++        # the official installer puts them
+         if sys.platform == "win32":
+-            _add_directory(library_dirs, 
+-                           os.path.join(os.environ.get("ProgramFiles", ""),
+-                                        "OpenJPEG 2.0", "lib"))
+-            _add_directory(include_dirs,
+-                           os.path.join(os.environ.get("ProgramFiles", ""),
+-                                        "OpenJPEG 2.0", "include"))
++            program_files = os.environ.get('ProgramFiles', '')
++            best_version = (0, 0)
++            best_path = None
++            for name in os.listdir(program_files):
++                if name.startswith('OpenJPEG '):
++                    version = tuple([int(x) for x in name[9:].strip().split('.')])
++                    if version > best_version:
++                        best_version = version
++                        best_path = os.path.join(program_files, name)
++
++            if best_path:
++                _add_directory(library_dirs,
++                               os.path.join(best_path, 'lib'))
++                _add_directory(include_dirs,
++                               os.path.join(best_path, 'include'))
+ 
+         #
+         # insert new dirs *before* default libs, to avoid conflicts
+@@ -369,10 +378,28 @@ class pil_build_ext(build_ext):
+                     feature.jpeg = "libjpeg"  # alternative name
+ 
+         if feature.want('jpeg2000'):
+-            if _find_include_file(self, "openjpeg-2.0/openjpeg.h"):
+-                if _find_library_file(self, "openjp2"):
+-                    feature.jpeg2000 = "openjp2"
+-                    
++            best_version = None
++            best_path = None
++            
++            # Find the best version
++            for directory in self.compiler.include_dirs:
++                for name in os.listdir(directory):
++                    if name.startswith('openjpeg-') and \
++                        os.path.isfile(os.path.join(directory, name,
++                                                    'openjpeg.h')):
++                        version = tuple([int(x) for x in name[9:].split('.')])
++                        if best_version is None or version > best_version:
++                            best_version = version
++                            best_path = os.path.join(directory, name)
++
++            if best_version and _find_library_file(self, 'openjp2'):
++                # Add the directory to the include path so we can include
++                # <openjpeg.h> rather than having to cope with the versioned
++                # include path
++                _add_directory(self.compiler.include_dirs, best_path, 0)
++                feature.jpeg2000 = 'openjp2'
++                feature.openjpeg_version = '.'.join([str(x) for x in best_version])
++                
+         if feature.want('tiff'):
+             if _find_library_file(self, "tiff"):
+                 feature.tiff = "tiff"
+@@ -566,7 +593,7 @@ class pil_build_ext(build_ext):
+         options = [
+             (feature.tcl and feature.tk, "TKINTER"),
+             (feature.jpeg, "JPEG"),
+-            (feature.jpeg2000, "OPENJPEG (JPEG2000)"),
++            (feature.jpeg2000, "OPENJPEG (JPEG2000)", feature.openjpeg_version),
+             (feature.zlib, "ZLIB (PNG/ZIP)"),
+             (feature.tiff, "LIBTIFF"),
+             (feature.freetype, "FREETYPE2"),
+@@ -577,7 +604,10 @@ class pil_build_ext(build_ext):
+         all = 1
+         for option in options:
+             if option[0]:
+-                print("--- %s support available" % option[1])
++                version = ''
++                if len(option) >= 3:
++                    version = ' (%s)' % option[2]
++                print("--- %s support available%s" % (option[1], version))
+             else:
+                 print("*** %s support not available" % option[1])
+                 if option[1] == "TKINTER" and _tkinter:

@@ -6,7 +6,7 @@
 %global name3 python3-pillow
 # bootstrap building docs (pillow is required by docutils, docutils are
 #  required by sphinx; pillow build-requires sphinx)
-%global with_docs 1
+%global with_docs 0
 
 # RHEL-7 doesn't have python 3
 %if 0%{?rhel} == 7
@@ -28,7 +28,7 @@
 
 Name:           python-pillow
 Version:        2.4.0
-Release:        8%{?snap}%{?dist}
+Release:        9%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -43,7 +43,8 @@ Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/pytho
 Patch0:         python-imaging-Pillow_ghostscript.patch
 # Have the tempfile use a suffix with a dot
 Patch1:         python-pillow_tmpsuffix.patch
-
+# openjpeg-2.1.0 compatibility
+Patch2:         python-pillow_openjpeg-2.1.0.patch
 
 BuildRequires:  tk-devel
 BuildRequires:  libjpeg-devel
@@ -220,6 +221,7 @@ PIL image wrapper for Qt.
 %setup -q -n python-imaging-Pillow-%{shortcommit}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 # Running test fails, see #921706#c38
 rm -f Tests/test_file_eps.py
@@ -386,6 +388,9 @@ popd
 %endif
 
 %changelog
+* Tue May 27 2014 Sandro Mani <manisandro@gmail.com> - 2.4.0-9
+- Rebuild against openjpeg-2.1.0
+
 * Fri May 23 2014 Dan Horák <dan[at]danny.cz> - 2.4.0-8
 - skip jpeg2k tests on big endian arches (#1100762)
 
