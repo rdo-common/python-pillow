@@ -33,11 +33,11 @@ Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
 License:        MIT
-URL:            http://python-imaging.github.com/Pillow/
+URL:            http://python-pillow.github.io/
 
 # Obtain the tarball for a certain commit via:
-#  wget --content-disposition https://github.com/python-imaging/Pillow/tarball/$commit
-Source0:        https://github.com/python-imaging/Pillow/tarball/%{commit}/python-imaging-Pillow-%{version}-%{ahead}-g%{shortcommit}.tar.gz
+#  wget --content-disposition https://github.com/python-pillow/Pillow/tarball/$commit
+Source0:        https://github.com/python-pillow/Pillow/tarball/%{commit}/python-imaging-Pillow-%{version}-%{ahead}-g%{shortcommit}.tar.gz
 
 # Fix ghostscript detection (upstream commit 82d7524add60d020a339503efe0559a11f89e238)
 Patch0:         python-imaging-Pillow_ghostscript.patch
