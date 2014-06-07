@@ -28,7 +28,7 @@
 
 Name:           python-pillow
 Version:        2.4.0
-Release:        10%{?snap}%{?dist}
+Release:        11%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -388,6 +388,9 @@ popd
 %endif
 
 %changelog
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.4.0-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
 * Wed May 27 2014 Sandro Mani <manisandro@gmail.com> - 2.4.0-10
 - Rebuild with docs enabled
 - Update python-pillow_openjpeg-2.1.0.patch
