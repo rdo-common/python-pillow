@@ -322,7 +322,7 @@ popd
 %{py2_incdir}/Imaging/
 
 %files doc
-%doc Scripts Images
+%doc Scripts
 %if 0%{?with_docs}
 %doc docs/_build/html
 %endif # with_docs
