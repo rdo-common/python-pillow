@@ -354,7 +354,7 @@ popd
 %{py3_incdir}/Imaging/
 
 %files -n %{name3}-doc
-%doc Scripts Images
+%doc Scripts
 %if 0%{?with_docs}
 %doc docs/_build/html
 %endif # with_docs
