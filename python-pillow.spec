@@ -211,7 +211,7 @@ PIL image wrapper for Qt.
 
 
 %prep
-%setup -q -n python-imaging-Pillow-%{shortcommit}
+%setup -q -n python-pillow-Pillow-%{shortcommit}
 
 # jpeg2k tests fail on big endians, see #1100762
 %ifarch ppc ppc64 ppc64p7 s390 s390x
