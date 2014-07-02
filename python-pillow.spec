@@ -17,7 +17,7 @@
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-imaging-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit 72de37caada5d9ff7c657ce5f4ad6f8a6a3870f0
+%global commit 80d6137c860b9322572ee1390514df1975acb2e7
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global ahead 0
 
@@ -27,8 +27,8 @@
 %endif
 
 Name:           python-pillow
-Version:        2.4.0
-Release:        11%{?snap}%{?dist}
+Version:        2.5.0
+Release:        1%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -37,14 +37,7 @@ URL:            http://python-pillow.github.io/
 
 # Obtain the tarball for a certain commit via:
 #  wget --content-disposition https://github.com/python-pillow/Pillow/tarball/$commit
-Source0:        https://github.com/python-pillow/Pillow/tarball/%{commit}/python-imaging-Pillow-%{version}-%{ahead}-g%{shortcommit}.tar.gz
-
-# Fix ghostscript detection (upstream commit 82d7524add60d020a339503efe0559a11f89e238)
-Patch0:         python-imaging-Pillow_ghostscript.patch
-# Have the tempfile use a suffix with a dot
-Patch1:         python-pillow_tmpsuffix.patch
-# openjpeg-2.1.0 compatibility
-Patch2:         python-pillow_openjpeg-2.1.0.patch
+Source0:        https://github.com/python-pillow/Pillow/tarball/%{commit}/python-pillow-Pillow-%{version}-%{ahead}-g%{shortcommit}.tar.gz
 
 BuildRequires:  tk-devel
 BuildRequires:  libjpeg-devel
@@ -219,12 +212,7 @@ PIL image wrapper for Qt.
 
 %prep
 %setup -q -n python-imaging-Pillow-%{shortcommit}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
 
-# Running test fails, see #921706#c38
-rm -f Tests/test_file_eps.py
 # jpeg2k tests fail on big endians, see #1100762
 %ifarch ppc ppc64 ppc64p7 s390 s390x
 rm -f Tests/test_file_jpeg2k.py
@@ -305,7 +293,6 @@ cp -R $PWD/Tests $PWD/build/%py2_libbuilddir/Tests
 cp -R $PWD/selftest.py $PWD/build/%py2_libbuilddir/selftest.py
 pushd build/%py2_libbuilddir
 PYTHONPATH=$PWD %{__python} selftest.py
-PYTHONPATH=$PWD %{__python} Tests/run.py
 popd
 
 %if %{with_python3}
@@ -316,7 +303,6 @@ cp -R $PWD/Tests $PWD/build/%py3_libbuilddir/Tests
 cp -R $PWD/selftest.py $PWD/build/%py3_libbuilddir/selftest.py
 pushd build/%py3_libbuilddir
 PYTHONPATH=$PWD %{__python3} selftest.py
-PYTHONPATH=$PWD %{__python3} Tests/run.py
 popd
 popd
 %endif
@@ -388,6 +374,9 @@ popd
 %endif
 
 %changelog
+* Wed Jul 02 2014 Sandro Mani <manisandro@gmail.com> - 2.5.0-1
+- Update to 2.5.0
+
 * Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.4.0-11
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 
