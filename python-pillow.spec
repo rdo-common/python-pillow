@@ -17,7 +17,7 @@
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-imaging-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit 1ab78b8fb7e1f7078dd110bc8d9fba3cc0006e51
+%global commit 4081f9f6a504c9d3b83237fafdecf2be042976a8
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global ahead 0
 
@@ -27,8 +27,8 @@
 %endif
 
 Name:           python-pillow
-Version:        2.5.1
-Release:        2%{?snap}%{?dist}
+Version:        2.5.2
+Release:        1%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -369,6 +369,9 @@ popd
 %endif
 
 %changelog
+* Wed Aug 13 2014 Sandro Mani <manisandro@gmail.com> - 2.5.2-1
+- Update to 2.5.2 (Fix CVE-2014-3589, a DOS in the IcnsImagePlugin)
+
 * Sat Jul 26 2014 Sandro Mani <manisandro@gmail.com> - 2.5.1-2
 - Reenable jpeg2k tests on big endian arches
 
