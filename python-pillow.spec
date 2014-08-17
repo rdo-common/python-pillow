@@ -28,7 +28,7 @@
 
 Name:           python-pillow
 Version:        2.5.2
-Release:        1%{?snap}%{?dist}
+Release:        2%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -369,6 +369,9 @@ popd
 %endif
 
 %changelog
+* Sun Aug 17 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.5.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
+
 * Wed Aug 13 2014 Sandro Mani <manisandro@gmail.com> - 2.5.2-1
 - Update to 2.5.2 (Fix CVE-2014-3589, a DOS in the IcnsImagePlugin)
 
