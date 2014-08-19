@@ -28,7 +28,7 @@
 
 Name:           python-pillow
 Version:        2.5.3
-Release:        1%{?snap}%{?dist}
+Release:        2%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -369,6 +369,9 @@ popd
 %endif
 
 %changelog
+* Tue Aug 19 2014 Stephen Gallagher <sgallagh@redhat.com> - 2.5.3-2
+- Rebuilding to resolve transient build error that caused BZ#1131723
+
 * Tue Aug 19 2014 Sandro Mani <manisandro@gmail.com> - 2.5.3-1
 - Update to 2.5.3 (Fix CVE-2014-3598, a DOS in the Jpeg2KImagePlugin)
 
