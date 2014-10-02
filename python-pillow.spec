@@ -17,7 +17,7 @@
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-imaging-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit 68c6904c280ad872620cc8d904e6d4e6ecc5b6f9
+%global commit 9634e437efeeda906ad6bfcc275b17732d64f32a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global ahead 0
 
@@ -27,8 +27,8 @@
 %endif
 
 Name:           python-pillow
-Version:        2.5.3
-Release:        3%{?snap}%{?dist}
+Version:        2.6.0
+Release:        1%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -213,6 +213,17 @@ PIL image wrapper for Qt.
 %prep
 %setup -q -n python-pillow-Pillow-%{shortcommit}
 
+# Fix spurious-executable-perm
+chmod -x libImaging/Jpeg2KEncode.c
+
+# Strip shebang on non-executable file
+sed -i 1d PIL/OleFileIO.py
+
+# Fix file encoding
+iconv --from=ISO-8859-1 --to=UTF-8 PIL/WalImageFile.py > PIL/WalImageFile.py.new && \
+touch -r PIL/WalImageFile.py PIL/WalImageFile.py.new && \
+mv PIL/WalImageFile.py.new PIL/WalImageFile.py
+
 %if %{with_python3}
 # Create Python 3 source tree
 rm -rf %{py3dir}
@@ -265,6 +276,10 @@ pushd Sane
 %{__python} setup.py install --skip-build --root %{buildroot}
 popd
 
+# Fix non-standard-executable-perm
+chmod 0755 %{buildroot}%{python_sitearch}/PIL/*.so
+chmod 0755 %{buildroot}%{python_sitearch}/*.so
+
 %if %{with_python3}
 # Install Python 3 modules
 pushd %{py3dir}
@@ -275,6 +290,10 @@ pushd Sane
 %{__python3} setup.py install --skip-build --root %{buildroot}
 popd
 popd
+
+# Fix non-standard-executable-perm
+chmod 0755 %{buildroot}%{python3_sitearch}/PIL/*.so
+chmod 0755 %{buildroot}%{python3_sitearch}/*.so
 %endif
 
 # The scripts are packaged in %%doc
@@ -369,6 +388,9 @@ popd
 %endif
 
 %changelog
+* Thu Oct 02 2014 Sandro Mani <manisandro@gmail.com> - 2.6.0-1
+- Update to 2.6.0
+
 * Wed Aug 20 2014 Sandro Mani <manisandro@gmail.com> - 2.5.3-3
 - Rebuilding again to resolve transient build error that caused BZ#1131723
 
