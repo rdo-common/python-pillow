@@ -1,5 +1,5 @@
-%global py2_incdir %{_includedir}/python%{python_version}
-%global py3_incdir %{_includedir}/python%{python3_version}
+%global py2_incdir %(python -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_inc())')
+%global py3_incdir %(python3 -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_inc())')
 %global py2_libbuilddir %(python -c 'import sys; import sysconfig; print("lib.{p}-{v[0]}.{v[1]}".format(p=sysconfig.get_platform(), v=sys.version_info))')
 %global py3_libbuilddir %(python3 -c 'import sys; import sysconfig; print("lib.{p}-{v[0]}.{v[1]}".format(p=sysconfig.get_platform(), v=sys.version_info))')
 
@@ -16,7 +16,7 @@
 %endif
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
-# The saved file has format python-imaging-Pillow-$version-$ahead-g$shortcommit.tar.gz
+# The saved file has format python-pillow-Pillow-$version-$ahead-g$shortcommit.tar.gz
 %global commit 0f05eb287a223ce106848cd048cfcb45e9faa565
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global ahead 0
@@ -44,10 +44,10 @@ BuildRequires:  libjpeg-devel
 BuildRequires:  zlib-devel
 BuildRequires:  freetype-devel
 BuildRequires:  lcms2-devel
-BuildRequires:  sane-backends-devel
 BuildRequires:  ghostscript
 BuildRequires:  openjpeg2-devel
 BuildRequires:  libwebp-devel
+BuildRequires:  libtiff-devel
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
@@ -89,8 +89,8 @@ Python image processing library, fork of the Python Imaging Library (PIL)
 This library provides extensive file format support, an efficient
 internal representation, and powerful image processing capabilities.
 
-There are five subpackages: tk (tk interface), qt (PIL image wrapper for Qt),
-sane (scanning devices interface), devel (development) and doc (documentation).
+There are four subpackages: tk (tk interface), qt (PIL image wrapper for Qt),
+devel (development) and doc (documentation).
 
 
 %package devel
@@ -113,18 +113,6 @@ BuildArch:      noarch
 
 %description doc
 Documentation for %{name}.
-
-
-%package sane
-Summary:        Python module for using scanners
-Group:          System Environment/Libraries
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Provides:       python-imaging-sane = %{version}-%{release}
-Obsoletes:      python-imaging-sane <= 1.1.7-12
-
-%description sane
-This package contains the sane module for Python which provides access to
-various raster scanning devices such as flatbed scanners and digital cameras.
 
 
 %package tk
@@ -178,16 +166,6 @@ BuildArch:      noarch
 Documentation for %{name3}.
 
 
-%package -n %{name3}-sane
-Summary:        Python module for using scanners
-Group:          System Environment/Libraries
-Requires:       %{name3}%{?_isa} = %{version}-%{release}
-
-%description -n %{name3}-sane
-This package contains the sane module for Python which provides access to
-various raster scanning devices such as flatbed scanners and digital cameras.
-
-
 %package -n %{name3}-tk
 Summary:        Tk interface for %{name3}
 Group:          System Environment/Libraries
@@ -200,7 +178,6 @@ Tk interface for %{name3}.
 %package -n %{name3}-qt
 Summary:        PIL image wrapper for Qt
 Group:          System Environment/Libraries
-Obsoletes:      %{name3} <= 2.0.0-5.git93a488e8
 Requires:       %{name3}%{?_isa} = %{version}-%{release}
 Requires:       python3-PyQt4
 
@@ -213,9 +190,6 @@ PIL image wrapper for Qt.
 %prep
 %setup -q -n python-pillow-Pillow-%{shortcommit}
 
-# Fix spurious-executable-perm
-chmod -x libImaging/Jpeg2KEncode.c
-
 # Strip shebang on non-executable file
 sed -i 1d PIL/OleFileIO.py
 
@@ -223,6 +197,10 @@ sed -i 1d PIL/OleFileIO.py
 iconv --from=ISO-8859-1 --to=UTF-8 PIL/WalImageFile.py > PIL/WalImageFile.py.new && \
 touch -r PIL/WalImageFile.py PIL/WalImageFile.py.new && \
 mv PIL/WalImageFile.py.new PIL/WalImageFile.py
+
+# Make sample scripts non-executable
+chmod -x Scripts/diffcover-run.sh
+chmod -x Scripts/diffcover-install.sh
 
 %if %{with_python3}
 # Create Python 3 source tree
@@ -236,10 +214,6 @@ cp -a . %{py3dir}
 find -name '*.py' | xargs sed -i '1s|^#!.*python|#!%{__python}|'
 CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py build
 
-pushd Sane
-CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py build
-popd
-
 %if 0%{?with_docs}
 pushd docs
 PYTHONPATH=$PWD/../build/%py2_libbuilddir make html
@@ -252,10 +226,6 @@ popd
 pushd %{py3dir}
 find -name '*.py' | xargs sed -i '1s|^#!.*python|#!%{__python3}|'
 CFLAGS="$RPM_OPT_FLAGS" %{__python3} setup.py build
-
-pushd Sane
-CFLAGS="$RPM_OPT_FLAGS" %{__python3} setup.py build
-popd
 
 %if 0%{?with_docs}
 pushd docs
@@ -272,13 +242,9 @@ popd
 install -d %{buildroot}/%{py2_incdir}/Imaging
 install -m 644 libImaging/*.h %{buildroot}/%{py2_incdir}/Imaging
 %{__python} setup.py install --skip-build --root %{buildroot}
-pushd Sane
-%{__python} setup.py install --skip-build --root %{buildroot}
-popd
 
 # Fix non-standard-executable-perm
 chmod 0755 %{buildroot}%{python_sitearch}/PIL/*.so
-chmod 0755 %{buildroot}%{python_sitearch}/*.so
 
 %if %{with_python3}
 # Install Python 3 modules
@@ -286,14 +252,10 @@ pushd %{py3dir}
 install -d %{buildroot}/%{py3_incdir}/Imaging
 install -m 644 libImaging/*.h %{buildroot}/%{py3_incdir}/Imaging
 %{__python3} setup.py install --skip-build --root %{buildroot}
-pushd Sane
-%{__python3} setup.py install --skip-build --root %{buildroot}
-popd
 popd
 
 # Fix non-standard-executable-perm
 chmod 0755 %{buildroot}%{python3_sitearch}/PIL/*.so
-chmod 0755 %{buildroot}%{python3_sitearch}/*.so
 %endif
 
 # The scripts are packaged in %%doc
@@ -323,10 +285,10 @@ popd
 
 
 %files
-%doc README.rst CHANGES.rst docs/COPYING
+%doc README.rst CHANGES.rst
+%license docs/COPYING
 %{python_sitearch}/*
 # These are in subpackages
-%exclude %{python_sitearch}/*sane*
 %exclude %{python_sitearch}/PIL/_imagingtk*
 %exclude %{python_sitearch}/PIL/ImageTk*
 %exclude %{python_sitearch}/PIL/SpiderImagePlugin*
@@ -341,10 +303,6 @@ popd
 %doc docs/_build/html
 %endif # with_docs
 
-%files sane
-%doc Sane/CHANGES Sane/demo*.py Sane/sanedoc.txt
-%{python_sitearch}/*sane*
-
 %files tk
 %{python_sitearch}/PIL/_imagingtk*
 %{python_sitearch}/PIL/ImageTk*
@@ -355,10 +313,10 @@ popd
 
 %if %{with_python3}
 %files -n %{name3}
-%doc README.rst CHANGES.rst docs/COPYING
+%doc README.rst CHANGES.rst
+%license docs/COPYING
 %{python3_sitearch}/*
 # These are in subpackages
-%exclude %{python3_sitearch}/*sane*
 %exclude %{python3_sitearch}/PIL/_imagingtk*
 %exclude %{python3_sitearch}/PIL/ImageTk*
 %exclude %{python3_sitearch}/PIL/SpiderImagePlugin*
@@ -373,10 +331,6 @@ popd
 %doc docs/_build/html
 %endif # with_docs
 
-%files -n %{name3}-sane
-%doc Sane/CHANGES Sane/demo*.py Sane/sanedoc.txt
-%{python3_sitearch}/*sane*
-
 %files -n %{name3}-tk
 %{python3_sitearch}/PIL/_imagingtk*
 %{python3_sitearch}/PIL/ImageTk*
@@ -388,8 +342,11 @@ popd
 %endif
 
 %changelog
-* Fri Jan 02 2015 Sandro Mani <manisandro@gmail.com> - 2.7.0-1
+* Mon Jan 12 2015 Sandro Mani <manisandro@gmail.com> - 2.7.0-1
 - Update to 2.7.0
+- Drop sane subpackage, is in python-sane now
+- Fix python3 headers directory
+- Drop Obsoletes: python3-pillow on python3-pillow-qt
 
 * Mon Oct 13 2014 Sandro Mani <manisandro@gmail.com> - 2.6.1-1
 - Update to 2.6.1
