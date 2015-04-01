@@ -17,7 +17,7 @@
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-pillow-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit 0f05eb287a223ce106848cd048cfcb45e9faa565
+%global commit d754598f146f868e8cd7d247b3af6cf3f3c8d510
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global ahead 0
 
@@ -27,7 +27,7 @@
 %endif
 
 Name:           python-pillow
-Version:        2.7.0
+Version:        2.8.0
 Release:        1%{?snap}%{?dist}
 Summary:        Python image processing library
 
@@ -342,6 +342,9 @@ popd
 %endif
 
 %changelog
+* Wed Apr 01 2015 Sandro Mani <manisandro@gmail.com> - 2.8.0-1
+- Update to 2.8.0
+
 * Mon Jan 12 2015 Sandro Mani <manisandro@gmail.com> - 2.7.0-1
 - Update to 2.7.0
 - Drop sane subpackage, is in python-sane now
