@@ -17,7 +17,7 @@
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-pillow-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit d754598f146f868e8cd7d247b3af6cf3f3c8d510
+%global commit 3f09b8f1715b018e8249337f1432070301c61e18
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global ahead 0
 
@@ -27,7 +27,7 @@
 %endif
 
 Name:           python-pillow
-Version:        2.8.0
+Version:        2.8.1
 Release:        1%{?snap}%{?dist}
 Summary:        Python image processing library
 
@@ -342,6 +342,9 @@ popd
 %endif
 
 %changelog
+* Thu Apr 02 2015 Sandro Mani <manisandro@gmail.com> - 2.8.1-1
+- Update to 2.8.1
+
 * Wed Apr 01 2015 Sandro Mani <manisandro@gmail.com> - 2.8.0-1
 - Update to 2.8.0
 
