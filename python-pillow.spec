@@ -17,7 +17,7 @@
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-pillow-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit 0222a059d62723fe056daa17f007f87dc46595b4
+%global commit 80672b61e8596c7d6dab7b4ef3ef1e4783902f51
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global ahead 0
 
@@ -27,8 +27,8 @@
 %endif
 
 Name:           python-pillow
-Version:        2.8.2
-Release:        2%{?snap}%{?dist}
+Version:        2.9.0
+Release:        1%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -56,7 +56,7 @@ BuildRequires:  PyQt4
 BuildRequires:  numpy
 %if 0%{?with_docs}
 BuildRequires:  python-sphinx
-BuildRequires:  python-sphinx-theme-better
+BuildRequires:  python-sphinx_rtd_theme
 %endif # with_docs
 BuildRequires:  python-cffi
 
@@ -68,7 +68,7 @@ BuildRequires:  python3-PyQt4
 BuildRequires:  python3-numpy
 %if 0%{?with_docs}
 BuildRequires:  python3-sphinx
-BuildRequires:  python3-sphinx-theme-better
+BuildRequires:  python3-sphinx_rtd_theme
 %endif # with_docs
 BuildRequires:  python3-cffi
 %endif
@@ -342,6 +342,9 @@ popd
 %endif
 
 %changelog
+* Thu Jul 02 2015 Sandro Mani <manisandro@gmail.com> - 2.9.0-1
+- Update to 2.9.0
+
 * Thu Jun 18 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.8.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
 
