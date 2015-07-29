@@ -28,7 +28,7 @@
 
 Name:           python-pillow
 Version:        2.9.0
-Release:        1%{?snap}%{?dist}
+Release:        2%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -170,7 +170,7 @@ Documentation for %{name3}.
 Summary:        Tk interface for %{name3}
 Group:          System Environment/Libraries
 Requires:       %{name3}%{?_isa} = %{version}-%{release}
-Requires:       tkinter
+Requires:       python3-tkinter
 
 %description -n %{name3}-tk
 Tk interface for %{name3}.
@@ -342,6 +342,9 @@ popd
 %endif
 
 %changelog
+* Thu Jul 02 2015 Sandro Mani <manisandro@gmail.com> - 2.9.0-2
+- Fix python3-pillow-tk Requires: tkinter -> python3-tkinter (#1248085)
+
 * Thu Jul 02 2015 Sandro Mani <manisandro@gmail.com> - 2.9.0-1
 - Update to 2.9.0
 
