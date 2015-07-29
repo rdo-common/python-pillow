@@ -342,7 +342,7 @@ popd
 %endif
 
 %changelog
-* Thu Jul 02 2015 Sandro Mani <manisandro@gmail.com> - 2.9.0-2
+* Wed Jul 29 2015 Sandro Mani <manisandro@gmail.com> - 2.9.0-2
 - Fix python3-pillow-tk Requires: tkinter -> python3-tkinter (#1248085)
 
 * Thu Jul 02 2015 Sandro Mani <manisandro@gmail.com> - 2.9.0-1
