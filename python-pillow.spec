@@ -17,7 +17,7 @@
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-pillow-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit 80672b61e8596c7d6dab7b4ef3ef1e4783902f51
+%global commit 0177cceac4adfd0020ecbf49fb44ad275dcc1f51
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global ahead 0
 
@@ -27,8 +27,8 @@
 %endif
 
 Name:           python-pillow
-Version:        2.9.0
-Release:        2%{?snap}%{?dist}
+Version:        3.0.0
+Release:        1%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -342,6 +342,9 @@ popd
 %endif
 
 %changelog
+* Fri Oct 02 2015 Sandro Mani <manisandro@gmail.com> - 3.0.0-1
+- Update to 3.0.0
+
 * Wed Jul 29 2015 Sandro Mani <manisandro@gmail.com> - 2.9.0-2
 - Fix python3-pillow-tk Requires: tkinter -> python3-tkinter (#1248085)
 
