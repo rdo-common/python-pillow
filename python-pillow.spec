@@ -6,7 +6,7 @@
 %global name3 python3-pillow
 # bootstrap building docs (pillow is required by docutils, docutils are
 #  required by sphinx; pillow build-requires sphinx)
-%global with_docs 1
+%global with_docs 0
 
 # RHEL-7 doesn't have python 3
 %if 0%{?rhel} == 7
@@ -28,7 +28,7 @@
 
 Name:           python-pillow
 Version:        3.0.0
-Release:        1%{?snap}%{?dist}
+Release:        2%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -342,6 +342,9 @@ popd
 %endif
 
 %changelog
+* Tue Oct 13 2015 Robert Kuska <rkuska@redhat.com> - 3.0.0-2
+- Rebuilt for Python3.5 rebuild without docs
+
 * Fri Oct 02 2015 Sandro Mani <manisandro@gmail.com> - 3.0.0-1
 - Update to 3.0.0
 
