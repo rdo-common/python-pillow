@@ -6,7 +6,7 @@
 %global name3 python3-pillow
 # bootstrap building docs (pillow is required by docutils, docutils are
 #  required by sphinx; pillow build-requires sphinx)
-%global with_docs 1
+%global with_docs 0
 
 # RHEL-7 doesn't have python 3
 %if 0%{?rhel} == 7
