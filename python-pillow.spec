@@ -28,7 +28,7 @@
 
 Name:           python-pillow
 Version:        3.0.0
-Release:        3%{?snap}%{?dist}
+Release:        4%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -342,6 +342,9 @@ popd
 %endif
 
 %changelog
+* Mon Dec 28 2015 Igor Gnatenko <i.gnatenko.brain@gmail.com> - 3.0.0-4
+- Rebuilt for libwebp soname bump
+
 * Wed Oct 14 2015 Robert Kuska <rkuska@redhat.com> - 3.0.0-3
 - Rebuilt for Python3.5 rebuild with docs
 
