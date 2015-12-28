@@ -6,7 +6,7 @@
 %global name3 python3-pillow
 # bootstrap building docs (pillow is required by docutils, docutils are
 #  required by sphinx; pillow build-requires sphinx)
-%global with_docs 0
+%global with_docs 1
 
 # RHEL-7 doesn't have python 3
 %if 0%{?rhel} == 7
@@ -28,7 +28,7 @@
 
 Name:           python-pillow
 Version:        3.0.0
-Release:        4%{?snap}%{?dist}
+Release:        5%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -342,6 +342,9 @@ popd
 %endif
 
 %changelog
+* Tue Dec 29 2015 Igor Gnatenko <i.gnatenko.brain@gmail.com> - 3.0.0-5
+- Build with docs
+
 * Mon Dec 28 2015 Igor Gnatenko <i.gnatenko.brain@gmail.com> - 3.0.0-4
 - Rebuilt for libwebp soname bump
 
