@@ -17,7 +17,7 @@
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-pillow-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit 0177cceac4adfd0020ecbf49fb44ad275dcc1f51
+%global commit fff5536b37c2d619c66c1189b6925fa0a8df3822
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global ahead 0
 
@@ -27,8 +27,8 @@
 %endif
 
 Name:           python-pillow
-Version:        3.0.0
-Release:        5%{?snap}%{?dist}
+Version:        3.1.0
+Release:        1%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -38,6 +38,9 @@ URL:            http://python-pillow.github.io/
 # Obtain the tarball for a certain commit via:
 #  wget --content-disposition https://github.com/python-pillow/Pillow/tarball/$commit
 Source0:        https://github.com/python-pillow/Pillow/tarball/%{commit}/python-pillow-Pillow-%{version}-%{ahead}-g%{shortcommit}.tar.gz
+
+# Backport upstream commit to fix incorrect conditional
+Patch0:         255a8b522022bfedf3d257fa4b3ff7259642cd01.patch
 
 BuildRequires:  tk-devel
 BuildRequires:  libjpeg-devel
@@ -189,6 +192,7 @@ PIL image wrapper for Qt.
 
 %prep
 %setup -q -n python-pillow-Pillow-%{shortcommit}
+%patch0 -p1
 
 # Strip shebang on non-executable file
 sed -i 1d PIL/OleFileIO.py
@@ -342,6 +346,9 @@ popd
 %endif
 
 %changelog
+* Mon Jan 04 2016 Sandro Mani <manisandro@gmail.com> - 3.1.0-1
+- Update to 3.1.0
+
 * Tue Dec 29 2015 Igor Gnatenko <i.gnatenko.brain@gmail.com> - 3.0.0-5
 - Build with docs
 
