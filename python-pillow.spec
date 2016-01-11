@@ -28,7 +28,7 @@
 
 Name:           python-pillow
 Version:        3.1.0
-Release:        1%{?snap}%{?dist}
+Release:        2%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -81,6 +81,8 @@ Requires:       ghostscript
 
 Provides:       python-imaging = %{version}-%{release}
 Obsoletes:      python-imaging <= 1.1.7-12
+
+Provides:       pyhton2-pillow
 
 %filter_provides_in %{python_sitearch}
 %filter_provides_in %{python3_sitearch}
@@ -250,6 +252,9 @@ install -m 644 libImaging/*.h %{buildroot}/%{py2_incdir}/Imaging
 # Fix non-standard-executable-perm
 chmod 0755 %{buildroot}%{python_sitearch}/PIL/*.so
 
+# Fix executable docs
+find Scripts -type f -exec chmod a-x \{\} \;
+
 %if %{with_python3}
 # Install Python 3 modules
 pushd %{py3dir}
@@ -260,6 +265,9 @@ popd
 
 # Fix non-standard-executable-perm
 chmod 0755 %{buildroot}%{python3_sitearch}/PIL/*.so
+
+# Fix executable docs
+find Scripts -type f -exec chmod a-x \{\} \;
 %endif
 
 # The scripts are packaged in %%doc
@@ -346,6 +354,10 @@ popd
 %endif
 
 %changelog
+* Mon Jan 11 2016 Toshio Kuratomi <toshio@fedoraproject.org> - 3.1.0-2
+- Fix executable files in doc package bringing in python 2 for the python3 doc
+  packages
+
 * Mon Jan 04 2016 Sandro Mani <manisandro@gmail.com> - 3.1.0-1
 - Update to 3.1.0
 
