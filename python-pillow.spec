@@ -17,7 +17,7 @@
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-pillow-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit fff5536b37c2d619c66c1189b6925fa0a8df3822
+%global commit eb72bf86fb867841f8a9e192e43e511bf4618709
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global ahead 0
 
@@ -27,8 +27,8 @@
 %endif
 
 Name:           python-pillow
-Version:        3.1.0
-Release:        2%{?snap}%{?dist}
+Version:        3.1.1
+Release:        1%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -354,6 +354,10 @@ popd
 %endif
 
 %changelog
+* Thu Feb 04 2016 Sandro Mani <manisandro@gmail.com> - 3.1.1-1
+- Update to 3.1.1
+- Fixes CVE-2016-0740, CVE-2016-0775
+
 * Mon Jan 11 2016 Toshio Kuratomi <toshio@fedoraproject.org> - 3.1.0-2
 - Fix executable files in doc package bringing in python 2 for the python3 doc
   packages
