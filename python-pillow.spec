@@ -8,10 +8,7 @@
 #  required by sphinx; pillow build-requires sphinx)
 %global with_docs 1
 
-# RHEL-7 doesn't have python 3
-%if 0%{?rhel} == 7
-  %global with_python3 0
-%else
+%if %{?fedora}
   %global with_python3 1
 %endif
 
@@ -28,7 +25,7 @@
 
 Name:           python-pillow
 Version:        3.1.1
-Release:        1%{?snap}%{?dist}
+Release:        2%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -82,7 +79,7 @@ Requires:       ghostscript
 Provides:       python-imaging = %{version}-%{release}
 Obsoletes:      python-imaging <= 1.1.7-12
 
-Provides:       pyhton2-pillow
+Provides:       python2-pillow
 
 %filter_provides_in %{python_sitearch}
 %filter_provides_in %{python3_sitearch}
@@ -354,6 +351,9 @@ popd
 %endif
 
 %changelog
+* Sun Feb 07 2016 Igor Gnatenko <i.gnatenko.brain@gmail.com> - 3.1.1-2
+- Fix provides
+
 * Thu Feb 04 2016 Sandro Mani <manisandro@gmail.com> - 3.1.1-1
 - Update to 3.1.1
 - Fixes CVE-2016-0740, CVE-2016-0775
