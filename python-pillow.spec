@@ -25,7 +25,7 @@
 
 Name:           python-pillow
 Version:        3.1.1
-Release:        2%{?snap}%{?dist}
+Release:        3%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -145,7 +145,13 @@ Summary:        Python 3 image processing library
 Provides:       python3-imaging = %{version}-%{release}
 
 %description -n %{name3}
-%{_description}
+Python image processing library, fork of the Python Imaging Library (PIL)
+
+This library provides extensive file format support, an efficient
+internal representation, and powerful image processing capabilities.
+
+There are four subpackages: tk (tk interface), qt (PIL image wrapper for Qt),
+devel (development) and doc (documentation).
 
 
 %package -n %{name3}-devel
@@ -351,6 +357,9 @@ popd
 %endif
 
 %changelog
+* Wed Feb 10 2016 Sandro Mani <manisandro@gmail.com> - 3.1.1-3
+- Fix broken python3-pillow package description
+
 * Sun Feb 07 2016 Igor Gnatenko <i.gnatenko.brain@gmail.com> - 3.1.1-2
 - Fix provides
 
