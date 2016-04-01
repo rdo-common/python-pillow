@@ -14,7 +14,7 @@
 
 # Refer to the comment for Source0 below on how to obtain the source tarball
 # The saved file has format python-pillow-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit eb72bf86fb867841f8a9e192e43e511bf4618709
+%global commit 344cb709ed0111adcc6ad47cc007507c3f5efeb3
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global ahead 0
 
@@ -24,8 +24,8 @@
 %endif
 
 Name:           python-pillow
-Version:        3.1.1
-Release:        3%{?snap}%{?dist}
+Version:        3.2.0
+Release:        1%{?snap}%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -35,9 +35,6 @@ URL:            http://python-pillow.github.io/
 # Obtain the tarball for a certain commit via:
 #  wget --content-disposition https://github.com/python-pillow/Pillow/tarball/$commit
 Source0:        https://github.com/python-pillow/Pillow/tarball/%{commit}/python-pillow-Pillow-%{version}-%{ahead}-g%{shortcommit}.tar.gz
-
-# Backport upstream commit to fix incorrect conditional
-Patch0:         255a8b522022bfedf3d257fa4b3ff7259642cd01.patch
 
 BuildRequires:  tk-devel
 BuildRequires:  libjpeg-devel
@@ -197,19 +194,9 @@ PIL image wrapper for Qt.
 
 %prep
 %setup -q -n python-pillow-Pillow-%{shortcommit}
-%patch0 -p1
 
 # Strip shebang on non-executable file
 sed -i 1d PIL/OleFileIO.py
-
-# Fix file encoding
-iconv --from=ISO-8859-1 --to=UTF-8 PIL/WalImageFile.py > PIL/WalImageFile.py.new && \
-touch -r PIL/WalImageFile.py PIL/WalImageFile.py.new && \
-mv PIL/WalImageFile.py.new PIL/WalImageFile.py
-
-# Make sample scripts non-executable
-chmod -x Scripts/diffcover-run.sh
-chmod -x Scripts/diffcover-install.sh
 
 %if %{with_python3}
 # Create Python 3 source tree
@@ -357,6 +344,9 @@ popd
 %endif
 
 %changelog
+* Fri Apr 01 2016 Sandro Mani <manisandro@gmail.com> - 3.2.0-1
+- Update to 3.2.0
+
 * Wed Feb 10 2016 Sandro Mani <manisandro@gmail.com> - 3.1.1-3
 - Fix broken python3-pillow package description
 
