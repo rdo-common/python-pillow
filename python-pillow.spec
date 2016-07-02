@@ -3,7 +3,7 @@
 %global py2_libbuilddir %(python -c 'import sys; import sysconfig; print("lib.{p}-{v[0]}.{v[1]}".format(p=sysconfig.get_platform(), v=sys.version_info))')
 %global py3_libbuilddir %(python3 -c 'import sys; import sysconfig; print("lib.{p}-{v[0]}.{v[1]}".format(p=sysconfig.get_platform(), v=sys.version_info))')
 
-%global name3 python3-pillow
+%global srcname pillow
 # bootstrap building docs (pillow is required by docutils, docutils are
 #  required by sphinx; pillow build-requires sphinx)
 %global with_docs 1
@@ -12,29 +12,15 @@
   %global with_python3 1
 %endif
 
-# Refer to the comment for Source0 below on how to obtain the source tarball
-# The saved file has format python-pillow-Pillow-$version-$ahead-g$shortcommit.tar.gz
-%global commit 344cb709ed0111adcc6ad47cc007507c3f5efeb3
-%global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global ahead 0
-
-# If ahead is 0, the tarball corresponds to a release version, otherwise to a git snapshot
-%if %{ahead} > 0
-%global snap .git%{shortcommit}
-%endif
-
-Name:           python-pillow
-Version:        3.2.0
-Release:        1%{?snap}%{?dist}
+Name:           python-%{srcname}
+Version:        3.3.0
+Release:        1%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
 License:        MIT
 URL:            http://python-pillow.github.io/
-
-# Obtain the tarball for a certain commit via:
-#  wget --content-disposition https://github.com/python-pillow/Pillow/tarball/$commit
-Source0:        https://github.com/python-pillow/Pillow/tarball/%{commit}/python-pillow-Pillow-%{version}-%{ahead}-g%{shortcommit}.tar.gz
+Source0:        https://github.com/python-pillow/Pillow/archive/%{version}/Pillow-%{version}.tar.gz
 
 BuildRequires:  tk-devel
 BuildRequires:  libjpeg-devel
@@ -47,21 +33,21 @@ BuildRequires:  libwebp-devel
 BuildRequires:  libtiff-devel
 
 BuildRequires:  python2-devel
-BuildRequires:  python-setuptools
+BuildRequires:  python2-setuptools
 BuildRequires:  tkinter
-BuildRequires:  PyQt4
-BuildRequires:  numpy
+BuildRequires:  python2-PyQt4
+BuildRequires:  python2-numpy
 %if 0%{?with_docs}
-BuildRequires:  python-sphinx
-BuildRequires:  python-sphinx_rtd_theme
+BuildRequires:  python2-sphinx
+BuildRequires:  python2-sphinx_rtd_theme
 %endif # with_docs
-BuildRequires:  python-cffi
+BuildRequires:  python2-cffi
 
 %if %{with_python3}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-tkinter
-BuildRequires:  python3-PyQt4
+BuildRequires:  python3-qt5
 BuildRequires:  python3-numpy
 %if 0%{?with_docs}
 BuildRequires:  python3-sphinx
@@ -73,12 +59,7 @@ BuildRequires:  python3-cffi
 # For EpsImagePlugin.py
 Requires:       ghostscript
 
-Provides:       python-imaging = %{version}-%{release}
-Obsoletes:      python-imaging <= 1.1.7-12
-
-Provides:       python2-pillow
-
-%filter_provides_in %{python_sitearch}
+%filter_provides_in %{python2_sitearch}
 %filter_provides_in %{python3_sitearch}
 %filter_setup
 
@@ -92,56 +73,14 @@ There are four subpackages: tk (tk interface), qt (PIL image wrapper for Qt),
 devel (development) and doc (documentation).
 
 
-%package devel
-Summary:        Development files for %{name}
-Group:          Development/Libraries
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       python-devel, libjpeg-devel, zlib-devel
-Provides:       python-imaging-devel = %{version}-%{release}
-Obsoletes:      python-imaging-devel <= 1.1.7-12
-
-%description devel
-Development files for %{name}.
+%package -n python2-%{srcname}
+Summary:        Python 2 image processing library
+%{?python_provide:%python_provide python2-%{srcname}}
+Provides:       python-imaging = %{version}-%{release}
+Provides:       python2-imaging = %{version}-%{release}
 
 
-%package doc
-Summary:        Documentation for %{name}
-Group:          Documentation
-Requires:       %{name} = %{version}-%{release}
-BuildArch:      noarch
-
-%description doc
-Documentation for %{name}.
-
-
-%package tk
-Summary:        Tk interface for %{name}
-Group:          System Environment/Libraries
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       tkinter
-Provides:       python-imaging-tk = %{version}-%{release}
-Obsoletes:      python-imaging-tk <= 1.1.7-12
-
-%description tk
-Tk interface for %{name}.
-
-%package qt
-Summary:        PIL image wrapper for Qt
-Group:          System Environment/Libraries
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       PyQt4
-Provides:       python-imaging-qt = %{version}-%{release}
-
-%description qt
-PIL image wrapper for Qt.
-
-
-%if %{with_python3}
-%package -n %{name3}
-Summary:        Python 3 image processing library
-Provides:       python3-imaging = %{version}-%{release}
-
-%description -n %{name3}
+%description -n python2-%{srcname}
 Python image processing library, fork of the Python Imaging Library (PIL)
 
 This library provides extensive file format support, an efficient
@@ -151,85 +90,140 @@ There are four subpackages: tk (tk interface), qt (PIL image wrapper for Qt),
 devel (development) and doc (documentation).
 
 
-%package -n %{name3}-devel
-Summary:        Development files for %{name3}
-Group:          Development/Libraries
-Requires:       %{name3}%{?_isa} = %{version}-%{release}
-Requires:       python3-devel, libjpeg-devel, zlib-devel
+%package -n python2-%{srcname}-devel
+Summary:        Development files for %{srcname}
+Requires:       python2-devel, libjpeg-devel, zlib-devel
+Requires:       python2-%{srcname}%{?_isa} = %{version}-%{release}
+%{?python_provide:%python_provide python2-%{srcname}-devel}
+Provides:       python-imaging-devel = %{version}-%{release}
+Provides:       python2-imaging-devel = %{version}-%{release}
 
-%description -n %{name3}-devel
-Development files for %{name3}.
+%description -n python2-%{srcname}-devel
+Development files for %{srcname}.
 
 
-%package -n %{name3}-doc
-Summary:        Documentation for %{name3}
-Group:          Documentation
-Requires:       %{name3} = %{version}-%{release}
+%package -n python2-%{srcname}-doc
+Summary:        Documentation for %{srcname}
 BuildArch:      noarch
+Requires:       python2-%{srcname} = %{version}-%{release}
+%{?python_provide:%python_provide python2-%{srcname}-doc}
+Provides:       python-imaging-doc = %{version}-%{release}
+Provides:       python2-imaging-doc = %{version}-%{release}
 
-%description -n %{name3}-doc
-Documentation for %{name3}.
+%description -n python2-%{srcname}-doc
+Documentation for %{srcname}.
 
 
-%package -n %{name3}-tk
-Summary:        Tk interface for %{name3}
-Group:          System Environment/Libraries
-Requires:       %{name3}%{?_isa} = %{version}-%{release}
-Requires:       python3-tkinter
+%package -n python2-%{srcname}-tk
+Summary:        Tk interface for %{srcname}
+Requires:       tkinter
+Requires:       python2-%{srcname}%{?_isa} = %{version}-%{release}
+%{?python_provide:%python_provide python2-%{srcname}-tk}
+Provides:       python-imaging-tk = %{version}-%{release}
+Provides:       python2-imaging-tk = %{version}-%{release}
 
-%description -n %{name3}-tk
-Tk interface for %{name3}.
+%description -n python2-%{srcname}-tk
+Tk interface for %{name}.
 
-%package -n %{name3}-qt
-Summary:        PIL image wrapper for Qt
-Group:          System Environment/Libraries
-Requires:       %{name3}%{?_isa} = %{version}-%{release}
+
+%package -n python2-%{srcname}-qt
+Summary:        Qt %{srcname} image wrapper
+Requires:       python2-PyQt4
+Requires:       python2-%{srcname}%{?_isa} = %{version}-%{release}
+%{?python_provide:%python_provide python2-%{srcname}-qt}
+Provides:       python-imaging-qt = %{version}-%{release}
+Provides:       python2-imaging-qt = %{version}-%{release}
+
+%description -n python2-%{srcname}-qt
+Qt %{srcname} image wrapper.
+
+
+%if %{with_python3}
+%package -n python3-%{srcname}
+Summary:        Python 3 image processing library
+%{?python_provide:%python_provide python3-%{srcname}}
+Provides:       python3-imaging = %{version}-%{release}
+
+
+%description -n python3-%{srcname}
+Python image processing library, fork of the Python Imaging Library (PIL)
+
+This library provides extensive file format support, an efficient
+internal representation, and powerful image processing capabilities.
+
+There are four subpackages: tk (tk interface), qt (PIL image wrapper for Qt),
+devel (development) and doc (documentation).
+
+
+%package -n python3-%{srcname}-devel
+Summary:        Development files for %{srcname}
+Requires:       python3-devel, libjpeg-devel, zlib-devel
+Requires:       python3-%{srcname}%{?_isa} = %{version}-%{release}
+%{?python_provide:%python_provide python3-%{srcname}-devel}
+Provides:       python3-imaging-devel = %{version}-%{release}
+
+%description -n python3-%{srcname}-devel
+Development files for %{srcname}.
+
+
+%package -n python3-%{srcname}-doc
+Summary:        Documentation for %{srcname}
+BuildArch:      noarch
+Requires:       python3-%{srcname} = %{version}-%{release}
+%{?python_provide:%python_provide python3-%{srcname}-doc}
+Provides:       python3-imaging-doc = %{version}-%{release}
+
+%description -n python3-%{srcname}-doc
+Documentation for %{srcname}.
+
+
+%package -n python3-%{srcname}-tk
+Summary:        Tk interface for %{srcname}
+Requires:       tkinter
+Requires:       python3-%{srcname}%{?_isa} = %{version}-%{release}
+%{?python_provide:%python_provide python3-%{srcname}-tk}
+Provides:       python3-imaging-tk = %{version}-%{release}
+
+%description -n python3-%{srcname}-tk
+Tk interface for %{name}.
+
+
+%package -n python3-%{srcname}-qt
+Summary:        Qt %{srcname} image wrapper
 Requires:       python3-PyQt4
+Requires:       python3-%{srcname}%{?_isa} = %{version}-%{release}
+%{?python_provide:%python_provide python3-%{srcname}-qt}
+Provides:       python3-imaging-qt = %{version}-%{release}
 
-%description -n %{name3}-qt
-PIL image wrapper for Qt.
-
+%description -n python3-%{srcname}-qt
+Qt %{srcname} image wrapper.
 %endif
 
 
 %prep
-%setup -q -n python-pillow-Pillow-%{shortcommit}
+%setup -q -n Pillow-%{version}
 
 # Strip shebang on non-executable file
 sed -i 1d PIL/OleFileIO.py
 
-%if %{with_python3}
-# Create Python 3 source tree
-rm -rf %{py3dir}
-cp -a . %{py3dir}
-%endif
-
 
 %build
 # Build Python 2 modules
-find -name '*.py' | xargs sed -i '1s|^#!.*python|#!%{__python}|'
-CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py build
+%py2_build
 
 %if 0%{?with_docs}
-pushd docs
-PYTHONPATH=$PWD/../build/%py2_libbuilddir make html
-rm -f _build/html/.buildinfo
-popd
+PYTHONPATH=$PWD/build/%py2_libbuilddir make -C docs html BUILDDIR=_build_py2 SPHINXBUILD=sphinx-build-%python2_version
+rm -f docs/_build_py2/html/.buildinfo
 %endif # with_docs
 
 %if %{with_python3}
 # Build Python 3 modules
-pushd %{py3dir}
-find -name '*.py' | xargs sed -i '1s|^#!.*python|#!%{__python3}|'
-CFLAGS="$RPM_OPT_FLAGS" %{__python3} setup.py build
+%py3_build
 
 %if 0%{?with_docs}
-pushd docs
-PYTHONPATH=$PWD/../build/%py3_libbuilddir make html SPHINXBUILD=sphinx-build-%python3_version
-rm -f _build/html/.buildinfo
-popd
+PYTHONPATH=$PWD/build/%py3_libbuilddir make -C docs html BUILDDIR=_build_py3 SPHINXBUILD=sphinx-build-%python3_version
+rm -f docs/_build_py3/html/.buildinfo
 %endif # with_docs
-popd
 %endif
 
 
@@ -237,27 +231,29 @@ popd
 # Install Python 2 modules
 install -d %{buildroot}/%{py2_incdir}/Imaging
 install -m 644 libImaging/*.h %{buildroot}/%{py2_incdir}/Imaging
-%{__python} setup.py install --skip-build --root %{buildroot}
+install -d %{buildroot}%{_defaultdocdir}/python2-%{srcname}-doc/Scripts
+install -m 644 Scripts/* %{buildroot}%{_defaultdocdir}/python2-%{srcname}-doc/Scripts
+%py2_install
 
 # Fix non-standard-executable-perm
-chmod 0755 %{buildroot}%{python_sitearch}/PIL/*.so
+chmod 0755 %{buildroot}%{python2_sitearch}/PIL/*.so
 
-# Fix executable docs
-find Scripts -type f -exec chmod a-x \{\} \;
+# Hardcode interpreter for example scripts
+find %{buildroot}%{_defaultdocdir}/python2-%{srcname}-doc/Scripts -name '*.py' | xargs sed -i '1s|^#!.*python|#!%{__python2}|'
 
 %if %{with_python3}
 # Install Python 3 modules
-pushd %{py3dir}
 install -d %{buildroot}/%{py3_incdir}/Imaging
 install -m 644 libImaging/*.h %{buildroot}/%{py3_incdir}/Imaging
-%{__python3} setup.py install --skip-build --root %{buildroot}
-popd
+install -d %{buildroot}%{_defaultdocdir}/python3-%{srcname}-doc/Scripts
+install -m 644 Scripts/* %{buildroot}%{_defaultdocdir}/python3-%{srcname}-doc/Scripts
+%py3_install
 
 # Fix non-standard-executable-perm
 chmod 0755 %{buildroot}%{python3_sitearch}/PIL/*.so
 
-# Fix executable docs
-find Scripts -type f -exec chmod a-x \{\} \;
+# Hardcode interpreter for example scripts
+find %{buildroot}%{_defaultdocdir}/python3-%{srcname}-doc/Scripts -name '*.py' | xargs sed -i '1s|^#!.*python|#!%{__python3}|'
 %endif
 
 # The scripts are packaged in %%doc
@@ -270,51 +266,49 @@ ln -s $PWD/Images $PWD/build/%py2_libbuilddir/Images
 cp -R $PWD/Tests $PWD/build/%py2_libbuilddir/Tests
 cp -R $PWD/selftest.py $PWD/build/%py2_libbuilddir/selftest.py
 pushd build/%py2_libbuilddir
-PYTHONPATH=$PWD %{__python} selftest.py
+PYTHONPATH=$PWD %{__python2} selftest.py
 popd
 
 %if %{with_python3}
 # Check Python 3 modules
-pushd %{py3dir}
 ln -s $PWD/Images $PWD/build/%py3_libbuilddir/Images
 cp -R $PWD/Tests $PWD/build/%py3_libbuilddir/Tests
 cp -R $PWD/selftest.py $PWD/build/%py3_libbuilddir/selftest.py
 pushd build/%py3_libbuilddir
 PYTHONPATH=$PWD %{__python3} selftest.py
 popd
-popd
 %endif
 
 
-%files
+%files -n python2-%{srcname}
 %doc README.rst CHANGES.rst
 %license docs/COPYING
-%{python_sitearch}/*
+%{python2_sitearch}/*
 # These are in subpackages
-%exclude %{python_sitearch}/PIL/_imagingtk*
-%exclude %{python_sitearch}/PIL/ImageTk*
-%exclude %{python_sitearch}/PIL/SpiderImagePlugin*
-%exclude %{python_sitearch}/PIL/ImageQt*
+%exclude %{python2_sitearch}/PIL/_imagingtk*
+%exclude %{python2_sitearch}/PIL/ImageTk*
+%exclude %{python2_sitearch}/PIL/SpiderImagePlugin*
+%exclude %{python2_sitearch}/PIL/ImageQt*
 
-%files devel
+%files -n python2-%{srcname}-devel
 %{py2_incdir}/Imaging/
 
-%files doc
-%doc Scripts
+%files -n python2-%{srcname}-doc
+%doc %{_defaultdocdir}/python2-%{srcname}-doc/Scripts
 %if 0%{?with_docs}
-%doc docs/_build/html
+%doc docs/_build_py2/html
 %endif # with_docs
 
-%files tk
-%{python_sitearch}/PIL/_imagingtk*
-%{python_sitearch}/PIL/ImageTk*
-%{python_sitearch}/PIL/SpiderImagePlugin*
+%files -n python2-%{srcname}-tk
+%{python2_sitearch}/PIL/_imagingtk*
+%{python2_sitearch}/PIL/ImageTk*
+%{python2_sitearch}/PIL/SpiderImagePlugin*
 
-%files qt
-%{python_sitearch}/PIL/ImageQt*
+%files -n python2-%{srcname}-qt
+%{python2_sitearch}/PIL/ImageQt*
 
 %if %{with_python3}
-%files -n %{name3}
+%files -n python3-%{srcname}
 %doc README.rst CHANGES.rst
 %license docs/COPYING
 %{python3_sitearch}/*
@@ -324,26 +318,30 @@ popd
 %exclude %{python3_sitearch}/PIL/SpiderImagePlugin*
 %exclude %{python3_sitearch}/PIL/ImageQt*
 
-%files -n %{name3}-devel
+%files -n python3-%{srcname}-devel
 %{py3_incdir}/Imaging/
 
-%files -n %{name3}-doc
-%doc Scripts
+%files -n python3-%{srcname}-doc
+%doc %{_defaultdocdir}/python3-%{srcname}-doc/Scripts
 %if 0%{?with_docs}
-%doc docs/_build/html
+%doc docs/_build_py3/html
 %endif # with_docs
 
-%files -n %{name3}-tk
+%files -n python3-%{srcname}-tk
 %{python3_sitearch}/PIL/_imagingtk*
 %{python3_sitearch}/PIL/ImageTk*
 %{python3_sitearch}/PIL/SpiderImagePlugin*
 
-%files -n %{name3}-qt
+%files -n python3-%{srcname}-qt
 %{python3_sitearch}/PIL/ImageQt*
-
 %endif
 
+
 %changelog
+* Sat Jul 02 2016 Sandro Mani <manisandro@gmail.com> - 3.3.0-1
+- Update to 3.3.0
+- Modernize spec
+
 * Fri Apr 01 2016 Sandro Mani <manisandro@gmail.com> - 3.2.0-1
 - Update to 3.2.0
 
