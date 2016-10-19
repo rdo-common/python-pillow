@@ -13,7 +13,7 @@
 %endif
 
 Name:           python-%{srcname}
-Version:        3.4.1
+Version:        3.4.2
 Release:        1%{?dist}
 Summary:        Python image processing library
 
@@ -338,6 +338,9 @@ popd
 
 
 %changelog
+* Wed Oct 19 2016 Sandro Mani <manisandro@gmail.com> - 3.4.2-1
+- Update to 3.4.2
+
 * Tue Oct 04 2016 Sandro Mani <manisandro@gmail.com> - 3.4.1-1
 - Update to 3.4.1
 
