@@ -6,7 +6,7 @@
 %global srcname pillow
 # bootstrap building docs (pillow is required by docutils, docutils are
 #  required by sphinx; pillow build-requires sphinx)
-%global with_docs 0
+%global with_docs 1
 
 %if %{?fedora}
   %global with_python3 1
@@ -14,7 +14,7 @@
 
 Name:           python-%{srcname}
 Version:        3.4.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -338,6 +338,9 @@ popd
 
 
 %changelog
+* Mon Dec 12 2016 Miro Hrončok <mhroncok@redhat.com> - 3.4.2-3
+- Enable docs build
+
 * Mon Dec 12 2016 Miro Hrončok <mhroncok@redhat.com> - 3.4.2-2
 - Rebuild for Python 3.6
 
