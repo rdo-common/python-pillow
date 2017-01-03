@@ -13,8 +13,8 @@
 %endif
 
 Name:           python-%{srcname}
-Version:        3.4.2
-Release:        3%{?dist}
+Version:        4.0.0
+Release:        1%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -31,12 +31,14 @@ BuildRequires:  ghostscript
 BuildRequires:  openjpeg2-devel
 BuildRequires:  libwebp-devel
 BuildRequires:  libtiff-devel
+BuildRequires:  libimagequant-devel
 
 BuildRequires:  python2-devel
 BuildRequires:  python2-setuptools
 BuildRequires:  tkinter
 BuildRequires:  python2-PyQt4
 BuildRequires:  python2-numpy
+BuildRequires:  python2-olefile
 %if 0%{?with_docs}
 BuildRequires:  python2-sphinx
 BuildRequires:  python2-sphinx_rtd_theme
@@ -49,6 +51,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-tkinter
 BuildRequires:  python3-qt5
 BuildRequires:  python3-numpy
+BuildRequires:  python3-olefile
 %if 0%{?with_docs}
 BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_rtd_theme
@@ -78,7 +81,8 @@ Summary:        Python 2 image processing library
 %{?python_provide:%python_provide python2-%{srcname}}
 Provides:       python-imaging = %{version}-%{release}
 Provides:       python2-imaging = %{version}-%{release}
-
+# For MicImagePlugin.py, FpxImagePlugin.py
+Requires:       python2-olefile
 
 %description -n python2-%{srcname}
 Python image processing library, fork of the Python Imaging Library (PIL)
@@ -143,7 +147,8 @@ Qt %{srcname} image wrapper.
 Summary:        Python 3 image processing library
 %{?python_provide:%python_provide python3-%{srcname}}
 Provides:       python3-imaging = %{version}-%{release}
-
+# For MicImagePlugin.py, FpxImagePlugin.py
+Requires:       python3-olefile
 
 %description -n python3-%{srcname}
 Python image processing library, fork of the Python Imaging Library (PIL)
@@ -338,6 +343,9 @@ popd
 
 
 %changelog
+* Tue Jan 03 2017 Sandro Mani <manisandro@gmail.com> - 4.0.0-1
+- Update to 4.0.0
+
 * Mon Dec 12 2016 Miro Hrončok <mhroncok@redhat.com> - 3.4.2-3
 - Enable docs build
 
