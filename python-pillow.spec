@@ -1,15 +1,17 @@
-%global py2_incdir %(python -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_inc())')
-%global py3_incdir %(python3 -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_inc())')
-%global py2_libbuilddir %(python -c 'import sys; import sysconfig; print("lib.{p}-{v[0]}.{v[1]}".format(p=sysconfig.get_platform(), v=sys.version_info))')
-%global py3_libbuilddir %(python3 -c 'import sys; import sysconfig; print("lib.{p}-{v[0]}.{v[1]}".format(p=sysconfig.get_platform(), v=sys.version_info))')
-
 %global srcname pillow
 # bootstrap building docs (pillow is required by docutils, docutils are
 #  required by sphinx; pillow build-requires sphinx)
-%global with_docs 1
+%global with_docs 0
 
-%if %{?fedora}
+%if 0%{?fedora}
   %global with_python3 1
+%endif
+
+%{?!py2_incdir: %global py2_incdir %(%{__python2} -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_inc())')}
+%{?!py2_libbuilddir: %global py2_libbuilddir %(%{__python2} -c 'import sys; import sysconfig; print("lib.{p}-{v[0]}.{v[1]}".format(p=sysconfig.get_platform(), v=sys.version_info))')}
+%if 0%{?with_python3}
+%{?!py3_incdir: %global py3_incdir %(%{__python3} -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_inc())')}
+%{?!py3_libbuilddir: %global py3_libbuilddir %(%{__python3} -c 'import sys; import sysconfig; print("lib.{p}-{v[0]}.{v[1]}".format(p=sysconfig.get_platform(), v=sys.version_info))')}
 %endif
 
 Name:           python-%{srcname}
@@ -45,7 +47,7 @@ BuildRequires:  python2-sphinx_rtd_theme
 %endif # with_docs
 BuildRequires:  python2-cffi
 
-%if %{with_python3}
+%if 0%{?with_python3}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-tkinter
@@ -142,7 +144,7 @@ Provides:       python2-imaging-qt = %{version}-%{release}
 Qt %{srcname} image wrapper.
 
 
-%if %{with_python3}
+%if 0%{?with_python3}
 %package -n python3-%{srcname}
 Summary:        Python 3 image processing library
 %{?python_provide:%python_provide python3-%{srcname}}
@@ -221,7 +223,7 @@ PYTHONPATH=$PWD/build/%py2_libbuilddir make -C docs html BUILDDIR=_build_py2 SPH
 rm -f docs/_build_py2/html/.buildinfo
 %endif # with_docs
 
-%if %{with_python3}
+%if 0%{?with_python3}
 # Build Python 3 modules
 %py3_build
 
@@ -246,7 +248,7 @@ chmod 0755 %{buildroot}%{python2_sitearch}/PIL/*.so
 # Hardcode interpreter for example scripts
 find %{buildroot}%{_defaultdocdir}/python2-%{srcname}-doc/Scripts -name '*.py' | xargs sed -i '1s|^#!.*python|#!%{__python2}|'
 
-%if %{with_python3}
+%if 0%{?with_python3}
 # Install Python 3 modules
 install -d %{buildroot}/%{py3_incdir}/Imaging
 install -m 644 libImaging/*.h %{buildroot}/%{py3_incdir}/Imaging
@@ -274,7 +276,7 @@ pushd build/%py2_libbuilddir
 PYTHONPATH=$PWD %{__python2} selftest.py
 popd
 
-%if %{with_python3}
+%if 0%{?with_python3}
 # Check Python 3 modules
 ln -s $PWD/Images $PWD/build/%py3_libbuilddir/Images
 cp -R $PWD/Tests $PWD/build/%py3_libbuilddir/Tests
@@ -312,7 +314,7 @@ popd
 %files -n python2-%{srcname}-qt
 %{python2_sitearch}/PIL/ImageQt*
 
-%if %{with_python3}
+%if 0%{?with_python3}
 %files -n python3-%{srcname}
 %doc README.rst CHANGES.rst
 %license docs/COPYING
