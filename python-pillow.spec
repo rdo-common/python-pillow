@@ -14,7 +14,7 @@
 
 Name:           python-%{srcname}
 Version:        4.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -343,6 +343,9 @@ popd
 
 
 %changelog
+* Wed Feb 01 2017 Sandro Mani <manisandro@gmail.com> - 4.0.0-2
+- Rebuild (libwebp)
+
 * Tue Jan 03 2017 Sandro Mani <manisandro@gmail.com> - 4.0.0-1
 - Update to 4.0.0
 
