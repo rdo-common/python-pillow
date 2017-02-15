@@ -14,7 +14,7 @@
 
 Name:           python-%{srcname}
 Version:        4.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -322,6 +322,9 @@ popd
 %exclude %{python3_sitearch}/PIL/ImageTk*
 %exclude %{python3_sitearch}/PIL/SpiderImagePlugin*
 %exclude %{python3_sitearch}/PIL/ImageQt*
+%exclude %{python3_sitearch}/PIL/__pycache__/ImageTk*
+%exclude %{python3_sitearch}/PIL/__pycache__/SpiderImagePlugin*
+%exclude %{python3_sitearch}/PIL/__pycache__/ImageQt*
 
 %files -n python3-%{srcname}-devel
 %{py3_incdir}/Imaging/
@@ -336,13 +339,19 @@ popd
 %{python3_sitearch}/PIL/_imagingtk*
 %{python3_sitearch}/PIL/ImageTk*
 %{python3_sitearch}/PIL/SpiderImagePlugin*
+%{python3_sitearch}/PIL/__pycache__/ImageTk*
+%{python3_sitearch}/PIL/__pycache__/SpiderImagePlugin*
 
 %files -n python3-%{srcname}-qt
 %{python3_sitearch}/PIL/ImageQt*
+%{python3_sitearch}/PIL/__pycache__/ImageQt*
 %endif
 
 
 %changelog
+* Wed Feb 15 2017 Sandro Mani <manisandro@gmail.com> - 4.0.0-3
+- Fix some __pycache__ files in wrong subpackage (#1422606)
+
 * Wed Feb 01 2017 Sandro Mani <manisandro@gmail.com> - 4.0.0-2
 - Rebuild (libwebp)
 
