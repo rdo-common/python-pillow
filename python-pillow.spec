@@ -13,8 +13,8 @@
 %endif
 
 Name:           python-%{srcname}
-Version:        4.0.0
-Release:        3%{?dist}
+Version:        4.1.0
+Release:        1%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -349,6 +349,9 @@ popd
 
 
 %changelog
+* Wed Apr 05 2017 Sandro Mani <manisandro@gmail.com> - 4.1.0-1
+- Update to 4.1.0
+
 * Wed Feb 15 2017 Sandro Mani <manisandro@gmail.com> - 4.0.0-3
 - Fix some __pycache__ files in wrong subpackage (#1422606)
 
