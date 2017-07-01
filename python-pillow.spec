@@ -13,7 +13,7 @@
 %endif
 
 Name:           python-%{srcname}
-Version:        4.1.1
+Version:        4.2.0
 Release:        1%{?dist}
 Summary:        Python image processing library
 
@@ -349,6 +349,9 @@ popd
 
 
 %changelog
+* Sat Jul 01 2017 Sandro Mani <manisandro@gmail.com> - 4.2.0-1
+- Update to 4.2.0
+
 * Fri Apr 28 2017 Sandro Mani <manisandro@gmail.com> - 4.1.1-1
 - Update to 4.1.1
 
