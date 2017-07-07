@@ -14,7 +14,7 @@
 
 Name:           python-%{srcname}
 Version:        4.2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -349,6 +349,9 @@ popd
 
 
 %changelog
+* Fri Jul 07 2017 Igor Gnatenko <ignatenko@redhat.com> - 4.2.1-2
+- Rebuild due to bug in RPM (RHBZ #1468476)
+
 * Thu Jul 06 2017 Sandro Mani <manisandro@gmail.com> - 4.2.1-1
 - Update to 4.2.1
 
