@@ -8,7 +8,7 @@
 #  required by sphinx; pillow build-requires sphinx)
 %global with_docs 1
 
-%if %{?fedora}
+%if 0%{?fedora} || 0%{?rhel} > 7
   %global with_python3 1
 %endif
 
