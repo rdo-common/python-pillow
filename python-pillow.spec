@@ -14,7 +14,7 @@
 
 Name:           python-%{srcname}
 Version:        4.2.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -349,6 +349,9 @@ popd
 
 
 %changelog
+* Tue Sep 05 2017 Troy Dawson <tdawson@redhat.com> - 4.2.1-5
+- Cleanup spec file conditionals
+
 * Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 
