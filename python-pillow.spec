@@ -13,7 +13,7 @@
 %endif
 
 Name:           python-%{srcname}
-Version:        4.3.0
+Version:        5.0.0
 Release:        1%{?dist}
 Summary:        Python image processing library
 
@@ -21,6 +21,10 @@ Summary:        Python image processing library
 License:        MIT
 URL:            http://python-pillow.github.io/
 Source0:        https://github.com/python-pillow/Pillow/archive/%{version}/Pillow-%{version}.tar.gz
+
+# Add libdirs for ppc64le and armv7hl
+Patch0:         python-pillow_libdirs.patch
+
 
 BuildRequires:  tk-devel
 BuildRequires:  libjpeg-devel
@@ -62,9 +66,8 @@ BuildRequires:  python3-cffi
 # For EpsImagePlugin.py
 Requires:       ghostscript
 
-%filter_provides_in %{python2_sitearch}
-%filter_provides_in %{python3_sitearch}
-%filter_setup
+%global __provides_exclude_from ^%{python2_sitearch}/PIL/.*\\.so$
+%global __provides_exclude_from ^%{python3_sitearch}/PIL/.*\\.so$
 
 %description
 Python image processing library, fork of the Python Imaging Library (PIL)
@@ -206,10 +209,7 @@ Qt %{srcname} image wrapper.
 
 
 %prep
-%setup -q -n Pillow-%{version}
-
-# Strip shebang on non-executable file
-sed -i 1d PIL/OleFileIO.py
+%autosetup -p1 -n Pillow-%{version}
 
 
 %build
@@ -235,34 +235,15 @@ rm -f docs/_build_py3/html/.buildinfo
 %install
 # Install Python 2 modules
 install -d %{buildroot}/%{py2_incdir}/Imaging
-install -m 644 libImaging/*.h %{buildroot}/%{py2_incdir}/Imaging
-install -d %{buildroot}%{_defaultdocdir}/python2-%{srcname}-doc/Scripts
-install -m 644 Scripts/* %{buildroot}%{_defaultdocdir}/python2-%{srcname}-doc/Scripts
+install -m 644 src/libImaging/*.h %{buildroot}/%{py2_incdir}/Imaging
 %py2_install
-
-# Fix non-standard-executable-perm
-chmod 0755 %{buildroot}%{python2_sitearch}/PIL/*.so
-
-# Hardcode interpreter for example scripts
-find %{buildroot}%{_defaultdocdir}/python2-%{srcname}-doc/Scripts -name '*.py' | xargs sed -i '1s|^#!.*python|#!%{__python2}|'
 
 %if %{with_python3}
 # Install Python 3 modules
 install -d %{buildroot}/%{py3_incdir}/Imaging
-install -m 644 libImaging/*.h %{buildroot}/%{py3_incdir}/Imaging
-install -d %{buildroot}%{_defaultdocdir}/python3-%{srcname}-doc/Scripts
-install -m 644 Scripts/* %{buildroot}%{_defaultdocdir}/python3-%{srcname}-doc/Scripts
+install -m 644 src/libImaging/*.h %{buildroot}/%{py3_incdir}/Imaging
 %py3_install
-
-# Fix non-standard-executable-perm
-chmod 0755 %{buildroot}%{python3_sitearch}/PIL/*.so
-
-# Hardcode interpreter for example scripts
-find %{buildroot}%{_defaultdocdir}/python3-%{srcname}-doc/Scripts -name '*.py' | xargs sed -i '1s|^#!.*python|#!%{__python3}|'
 %endif
-
-# The scripts are packaged in %%doc
-rm -rf %{buildroot}%{_bindir}
 
 
 %check
@@ -299,7 +280,6 @@ popd
 %{py2_incdir}/Imaging/
 
 %files -n python2-%{srcname}-doc
-%doc %{_defaultdocdir}/python2-%{srcname}-doc/Scripts
 %if 0%{?with_docs}
 %doc docs/_build_py2/html
 %endif # with_docs
@@ -330,7 +310,6 @@ popd
 %{py3_incdir}/Imaging/
 
 %files -n python3-%{srcname}-doc
-%doc %{_defaultdocdir}/python3-%{srcname}-doc/Scripts
 %if 0%{?with_docs}
 %doc docs/_build_py3/html
 %endif # with_docs
@@ -349,6 +328,9 @@ popd
 
 
 %changelog
+* Wed Jan 03 2018 Sandro Mani <manisandro@gmail.com> - 5.0.0-1
+- Update to 5.0.0
+
 * Tue Oct 03 2017 Sandro Mani <manisandro@gmail.com> - 4.3.0-1
 - Update to 4.3.0
 
