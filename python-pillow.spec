@@ -14,7 +14,7 @@
 
 Name:           python-%{srcname}
 Version:        5.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -25,42 +25,42 @@ Source0:        https://github.com/python-pillow/Pillow/archive/%{version}/Pillo
 # Add libdirs for ppc64le and armv7hl
 Patch0:         python-pillow_libdirs.patch
 
-
-BuildRequires:  tk-devel
-BuildRequires:  libjpeg-devel
-BuildRequires:  zlib-devel
 BuildRequires:  freetype-devel
-BuildRequires:  lcms2-devel
+BuildRequires:  gcc
 BuildRequires:  ghostscript
-BuildRequires:  openjpeg2-devel
-BuildRequires:  libwebp-devel
-BuildRequires:  libtiff-devel
+BuildRequires:  lcms2-devel
 BuildRequires:  libimagequant-devel
+BuildRequires:  libjpeg-devel
+BuildRequires:  libtiff-devel
+BuildRequires:  libwebp-devel
+BuildRequires:  openjpeg2-devel
+BuildRequires:  tk-devel
+BuildRequires:  zlib-devel
 
+BuildRequires:  python2-cffi
 BuildRequires:  python2-devel
-BuildRequires:  python2-setuptools
-BuildRequires:  tkinter
-BuildRequires:  python2-PyQt4
 BuildRequires:  python2-numpy
 BuildRequires:  python2-olefile
+BuildRequires:  python2-PyQt4
+BuildRequires:  python2-setuptools
 %if 0%{?with_docs}
 BuildRequires:  python2-sphinx
 BuildRequires:  python2-sphinx_rtd_theme
 %endif # with_docs
-BuildRequires:  python2-cffi
+BuildRequires:  python2-tkinter
 
 %if %{with_python3}
+BuildRequires:  python3-cffi
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-tkinter
-BuildRequires:  python3-qt5
 BuildRequires:  python3-numpy
 BuildRequires:  python3-olefile
+BuildRequires:  python3-qt5
+BuildRequires:  python3-setuptools
 %if 0%{?with_docs}
 BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_rtd_theme
 %endif # with_docs
-BuildRequires:  python3-cffi
+BuildRequires:  python3-tkinter
 %endif
 
 # For EpsImagePlugin.py
@@ -328,6 +328,9 @@ popd
 
 
 %changelog
+* Wed Mar 07 2018 Sandro Mani <manisandro@gmail.com> - 5.0.0-3
+- Add missing BR: gcc
+
 * Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
