@@ -13,17 +13,14 @@
 %endif
 
 Name:           python-%{srcname}
-Version:        5.0.0
-Release:        3%{?dist}
+Version:        5.1.0
+Release:        1%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
 License:        MIT
 URL:            http://python-pillow.github.io/
 Source0:        https://github.com/python-pillow/Pillow/archive/%{version}/Pillow-%{version}.tar.gz
-
-# Add libdirs for ppc64le and armv7hl
-Patch0:         python-pillow_libdirs.patch
 
 BuildRequires:  freetype-devel
 BuildRequires:  gcc
@@ -328,6 +325,9 @@ popd
 
 
 %changelog
+* Thu Apr 05 2018 Sandro Mani <manisandro@gmail.com> - 5.1.0-1
+- Update to 5.1.0
+
 * Wed Mar 07 2018 Sandro Mani <manisandro@gmail.com> - 5.0.0-3
 - Add missing BR: gcc
 
