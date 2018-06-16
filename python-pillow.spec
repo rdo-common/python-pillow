@@ -14,7 +14,7 @@
 
 Name:           python-%{srcname}
 Version:        5.1.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -325,6 +325,9 @@ popd
 
 
 %changelog
+* Sat Jun 16 2018 Miro Hrončok <mhroncok@redhat.com> - 5.1.1-2
+- Rebuilt for Python 3.7
+
 * Wed Apr 25 2018 Sandro Mani <manisandro@gmail.com> - 5.1.1-1
 - Update to 5.1.1
 
