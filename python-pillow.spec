@@ -14,7 +14,7 @@
 
 Name:           python-%{srcname}
 Version:        5.1.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -120,7 +120,7 @@ Documentation for %{srcname}.
 
 %package -n python2-%{srcname}-tk
 Summary:        Tk interface for %{srcname}
-Requires:       tkinter
+Requires:       python2-tkinter
 Requires:       python2-%{srcname}%{?_isa} = %{version}-%{release}
 %{?python_provide:%python_provide python2-%{srcname}-tk}
 Provides:       python-imaging-tk = %{version}-%{release}
@@ -184,7 +184,7 @@ Documentation for %{srcname}.
 
 %package -n python3-%{srcname}-tk
 Summary:        Tk interface for %{srcname}
-Requires:       tkinter
+Requires:       python3-tkinter
 Requires:       python3-%{srcname}%{?_isa} = %{version}-%{release}
 %{?python_provide:%python_provide python3-%{srcname}-tk}
 Provides:       python3-imaging-tk = %{version}-%{release}
@@ -325,6 +325,9 @@ popd
 
 
 %changelog
+* Wed Jun 27 2018 Miro Hrončok <mhroncok@redhat.com> - 5.1.1-3
+- Fix the tkinter dependency
+
 * Sat Jun 16 2018 Miro Hrončok <mhroncok@redhat.com> - 5.1.1-2
 - Rebuilt for Python 3.7
 
