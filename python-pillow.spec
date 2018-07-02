@@ -13,8 +13,8 @@
 %endif
 
 Name:           python-%{srcname}
-Version:        5.1.1
-Release:        3%{?dist}
+Version:        5.2.0
+Release:        1%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -325,6 +325,9 @@ popd
 
 
 %changelog
+* Mon Jul 02 2018 Sandro Mani <manisandro@gmail.com> - 5.2.0-1
+- Update to 5.2.0
+
 * Wed Jun 27 2018 Miro Hrončok <mhroncok@redhat.com> - 5.1.1-3
 - Fix the tkinter dependency
 
