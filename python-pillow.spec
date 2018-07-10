@@ -16,7 +16,7 @@
 
 Name:           python-%{srcname}
 Version:        4.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -345,6 +345,9 @@ popd
 
 
 %changelog
+* Tue Jul 10 2017 Alfredo Moralejo <amoralej@redhat.com> - 4.0.0-2
+- Rebuild to add ppc64le arch.
+
 * Tue Jan 03 2017 Sandro Mani <manisandro@gmail.com> - 4.0.0-1
 - Update to 4.0.0
 
