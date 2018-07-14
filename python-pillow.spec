@@ -14,7 +14,7 @@
 
 Name:           python-%{srcname}
 Version:        5.2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -325,6 +325,9 @@ popd
 
 
 %changelog
+* Sat Jul 14 2018 Fedora Release Engineering <releng@fedoraproject.org> - 5.2.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
 * Mon Jul 02 2018 Miro Hrončok <mhroncok@redhat.com> - 5.2.0-2
 - Rebuilt for Python 3.7
 
