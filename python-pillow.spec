@@ -1,6 +1,6 @@
-%global py2_incdir %(python -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_inc())')
+%global py2_incdir %(python2 -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_inc())')
 %global py3_incdir %(python3 -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_inc())')
-%global py2_libbuilddir %(python -c 'import sys; import sysconfig; print("lib.{p}-{v[0]}.{v[1]}".format(p=sysconfig.get_platform(), v=sys.version_info))')
+%global py2_libbuilddir %(python2 -c 'import sys; import sysconfig; print("lib.{p}-{v[0]}.{v[1]}".format(p=sysconfig.get_platform(), v=sys.version_info))')
 %global py3_libbuilddir %(python3 -c 'import sys; import sysconfig; print("lib.{p}-{v[0]}.{v[1]}".format(p=sysconfig.get_platform(), v=sys.version_info))')
 
 %global srcname pillow
