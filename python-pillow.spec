@@ -14,7 +14,7 @@
 
 Name:           python-%{srcname}
 Version:        5.4.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -325,6 +325,9 @@ popd
 
 
 %changelog
+* Sat Feb 02 2019 Fedora Release Engineering <releng@fedoraproject.org> - 5.4.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
 * Mon Jan 07 2019 Sandro Mani <manisandro@gmail.com> - 5.4.1-1
 - Update to 5.4.1
 
