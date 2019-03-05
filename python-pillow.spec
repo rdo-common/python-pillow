@@ -3,8 +3,11 @@
 
 %if 0%{?fedora} || 0%{?rhel} > 7
 %global with_python3 1
+%global tkinter_package python2-tkinter
 %global py3_incdir %(python3 -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_inc())')
 %global py3_libbuilddir %(python3 -c 'import sys; import sysconfig; print("lib.{p}-{v[0]}.{v[1]}".format(p=sysconfig.get_platform(), v=sys.version_info))')
+%else
+%global tkinter_package tkinter
 %endif
 
 %global srcname pillow
@@ -44,7 +47,7 @@ BuildRequires:  python2-setuptools
 BuildRequires:  python2-sphinx
 BuildRequires:  python2-sphinx_rtd_theme
 %endif # with_docs
-BuildRequires:  python2-tkinter
+BuildRequires:  %{tkinter_package}
 
 %if 0%{?with_python3}
 BuildRequires:  python3-cffi
@@ -120,7 +123,7 @@ Documentation for %{srcname}.
 
 %package -n python2-%{srcname}-tk
 Summary:        Tk interface for %{srcname}
-Requires:       python2-tkinter
+Requires:       %{tkinter_package}
 Requires:       python2-%{srcname}%{?_isa} = %{version}-%{release}
 %{?python_provide:%python_provide python2-%{srcname}-tk}
 Provides:       python-imaging-tk = %{version}-%{release}
